@@ -1,0 +1,471 @@
+<!doctype html>
+
+<html class="dark" lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 400,
+          "GRAD" 0,
+          "opsz" 24;
+      }
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #0b1326;
+        color: #dae2fd;
+      }
+      .font-headline {
+        font-family: "Manrope", sans-serif;
+      }
+      .glass-panel {
+        background: rgba(34, 42, 61, 0.4);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+      }
+      .hide-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .hide-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+    </style>
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "secondary-fixed": "#dae2fd",
+              "surface-tint": "#adc6ff",
+              "tertiary-fixed-dim": "#4edea3",
+              "surface-container-low": "#131b2e",
+              outline: "#909097",
+              "on-surface": "#dae2fd",
+              surface: "#0b1326",
+              "tertiary-fixed": "#6ffbbe",
+              "secondary-fixed-dim": "#bec6e0",
+              "on-tertiary-container": "#009365",
+              "surface-container-lowest": "#060e20",
+              "inverse-surface": "#dae2fd",
+              "on-background": "#dae2fd",
+              "surface-dim": "#0b1326",
+              "on-error-container": "#ffdad6",
+              "on-secondary": "#283044",
+              "surface-bright": "#31394d",
+              secondary: "#bec6e0",
+              "on-tertiary-fixed": "#002113",
+              "secondary-container": "#3f465c",
+              "surface-container-high": "#222a3d",
+              "on-secondary-fixed": "#131b2e",
+              "surface-container-highest": "#2d3449",
+              "inverse-primary": "#005ac2",
+              "on-primary": "#002e6a",
+              "on-error": "#690005",
+              "on-surface-variant": "#c6c6cd",
+              "on-secondary-container": "#adb4ce",
+              tertiary: "#4edea3",
+              error: "#ffb4ab",
+              "on-primary-fixed-variant": "#004395",
+              background: "#0b1326",
+              "on-tertiary-fixed-variant": "#005236",
+              "primary-container": "#00163a",
+              "error-container": "#93000a",
+              "inverse-on-surface": "#283044",
+              "on-tertiary": "#003824",
+              "on-primary-container": "#357df1",
+              "on-secondary-fixed-variant": "#3f465c",
+              primary: "#adc6ff",
+              "surface-container": "#171f33",
+              "primary-fixed-dim": "#adc6ff",
+              "on-primary-fixed": "#001a42",
+              "outline-variant": "#45464d",
+              "surface-variant": "#2d3449",
+              "primary-fixed": "#d8e2ff",
+              "tertiary-container": "#001c10",
+            },
+            fontFamily: {
+              headline: ["Manrope"],
+              body: ["Inter"],
+              label: ["Inter"],
+            },
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              lg: "0.5rem",
+              xl: "0.75rem",
+              full: "9999px",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body {
+        min-height: max(884px, 100dvh);
+      }
+    </style>
+  </head>
+  <body class="bg-surface text-on-surface min-h-screen pb-32">
+    <!-- TopAppBar Execution -->
+    <header
+      class="fixed top-0 w-full flex justify-between items-center px-6 py-4 max-w-7xl mx-auto bg-[#0b1326]/60 backdrop-blur-xl z-50"
+    >
+      <div class="flex items-center gap-3">
+        <div
+          class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary/20"
+        >
+          <img
+            alt="User avatar"
+            class="w-full h-full object-cover"
+            data-alt="Professional headshot of a foreman in a clean workshop, wearing a subtle blue industrial shirt, soft cinematic lighting"
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCXDQIi_F-7uW0O2Il1qx4LCesn2ETy6KTBmMV2hOoA8x_8qfwVlzx_vfjgGZVnc1KN9t8xOyEYj5JfO1blKglSEa0KXClls4aF7eaAbWvf0cXLgjIdICFtRf_fqOIxr_WIkv-jWJ2_fHPhrGgjtLM_mM4wmS40mb8PUbrufBq44Vv4s18l0D59_YP-glIPNJImiU5_1WkzNAG7HgNUl2wl2nGqtACxWLFJ4H-DLjfnKLuq9hjDW9cxoglL2VXgn-gg4zMi7h7ml1EK"
+          />
+        </div>
+        <div>
+          <span
+            class="block text-[17px] font-bold text-primary font-headline tracking-tight"
+            >Bonjour, Jean</span
+          >
+          <span
+            class="block text-[10px] text-outline font-label uppercase tracking-widest"
+            >Poste de Contrôle Beta</span
+          >
+        </div>
+      </div>
+      <div
+        class="relative p-2 rounded-full hover:bg-[#222a3d] transition-colors duration-200 cursor-pointer active:scale-95"
+      >
+        <span class="material-symbols-outlined text-primary"
+          >notifications</span
+        >
+        <span
+          class="absolute top-2 right-2 w-2.5 h-2.5 bg-error rounded-full border-2 border-surface"
+        ></span>
+      </div>
+    </header>
+    <main class="mt-20 px-6 space-y-8">
+      <!-- Search Bar -->
+      <section class="relative">
+        <div
+          class="flex items-center bg-surface-container-highest rounded-xl px-4 py-3 shadow-lg"
+        >
+          <span
+            class="material-symbols-outlined text-outline mr-3"
+            data-icon="search"
+            >search</span
+          >
+          <input
+            class="bg-transparent border-none focus:ring-0 text-on-surface placeholder-outline w-full text-sm font-body"
+            placeholder="Rechercher un outil..."
+            type="text"
+          />
+          <button class="ml-2 text-primary">
+            <span class="material-symbols-outlined" data-icon="tune">tune</span>
+          </button>
+        </div>
+      </section>
+      <!-- Quick Stats Horizontal Scroll -->
+      <section>
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="font-headline text-lg font-bold text-on-surface">
+            Indicateurs Temps Réel
+          </h2>
+          <span class="text-xs text-primary font-bold tracking-wider uppercase"
+            >Voir tout</span
+          >
+        </div>
+        <div class="flex gap-4 overflow-x-auto hide-scrollbar pb-4 -mx-6 px-6">
+          <!-- Card 1 -->
+          <div
+            class="min-w-[160px] bg-surface-container-high p-4 rounded-xl flex flex-col justify-between border-l-4 border-primary"
+          >
+            <span
+              class="text-[10px] font-bold text-outline uppercase tracking-wider mb-2"
+              >Outils totaux</span
+            >
+            <div class="flex items-end justify-between">
+              <span class="text-3xl font-bold font-headline text-on-surface"
+                >127</span
+              >
+              <span class="text-[10px] font-bold text-tertiary mb-1">+12</span>
+            </div>
+          </div>
+          <!-- Card 2 -->
+          <div
+            class="min-w-[160px] bg-surface-container-high p-4 rounded-xl flex flex-col justify-between border-l-4 border-on-primary-container"
+          >
+            <span
+              class="text-[10px] font-bold text-outline uppercase tracking-wider mb-2"
+              >En utilisation</span
+            >
+            <div class="flex items-end justify-between">
+              <span class="text-3xl font-bold font-headline text-on-surface"
+                >23</span
+              >
+              <span class="text-[10px] font-bold text-error mb-1">-5</span>
+            </div>
+          </div>
+          <!-- Card 3 -->
+          <div
+            class="min-w-[160px] bg-surface-container-high p-4 rounded-xl flex flex-col justify-between border-l-4 border-error"
+          >
+            <span
+              class="text-[10px] font-bold text-outline uppercase tracking-wider mb-2"
+              >À localiser</span
+            >
+            <div class="flex items-end justify-between">
+              <span class="text-3xl font-bold font-headline text-error">5</span>
+              <span
+                class="material-symbols-outlined text-error"
+                data-weight="fill"
+                style="font-variation-settings: &quot;FILL&quot; 1"
+                >warning</span
+              >
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- Recent Movements -->
+      <section class="space-y-4">
+        <div class="flex items-center justify-between">
+          <h2 class="font-headline text-lg font-bold text-on-surface">
+            Mouvements Récents
+          </h2>
+          <span
+            class="material-symbols-outlined text-outline"
+            data-icon="history"
+            >history</span
+          >
+        </div>
+        <div class="space-y-3">
+          <!-- Item 1 -->
+          <div
+            class="glass-panel p-4 rounded-xl flex items-center justify-between"
+          >
+            <div class="flex items-center gap-4">
+              <div
+                class="w-12 h-12 bg-surface-container-highest rounded-lg flex items-center justify-center"
+              >
+                <span
+                  class="material-symbols-outlined text-primary"
+                  data-icon="handyman"
+                  >handyman</span
+                >
+              </div>
+              <div>
+                <h3 class="font-bold text-sm text-on-surface">Bosch Drill</h3>
+                <div class="flex items-center gap-2 mt-0.5">
+                  <span
+                    class="text-[10px] font-bold bg-tertiary/20 text-tertiary px-1.5 py-0.5 rounded uppercase tracking-tighter"
+                    >RFID OUT</span
+                  >
+                  <span class="text-[10px] text-outline font-medium"
+                    >Jean D.</span
+                  >
+                </div>
+              </div>
+            </div>
+            <div class="text-right">
+              <span class="block font-bold text-xs text-on-surface">09:15</span>
+              <span class="block text-[10px] text-tertiary font-bold uppercase"
+                >Actif</span
+              >
+            </div>
+          </div>
+          <!-- Item 2 -->
+          <div
+            class="glass-panel p-4 rounded-xl flex items-center justify-between"
+          >
+            <div class="flex items-center gap-4">
+              <div
+                class="w-12 h-12 bg-surface-container-highest rounded-lg flex items-center justify-center"
+              >
+                <span
+                  class="material-symbols-outlined text-primary"
+                  data-icon="precision_manufacturing"
+                  >precision_manufacturing</span
+                >
+              </div>
+              <div>
+                <h3 class="font-bold text-sm text-on-surface">Oscilloscope</h3>
+                <div class="flex items-center gap-2 mt-0.5">
+                  <span
+                    class="text-[10px] font-bold bg-on-primary-container/20 text-on-primary-container px-1.5 py-0.5 rounded uppercase tracking-tighter"
+                    >BLE detected</span
+                  >
+                  <span class="text-[10px] text-outline font-medium"
+                    >Lab 2</span
+                  >
+                </div>
+              </div>
+            </div>
+            <div class="text-right">
+              <span class="block font-bold text-xs text-on-surface">08:42</span>
+              <span
+                class="block text-[10px] text-on-primary-container font-bold uppercase"
+                >Stable</span
+              >
+            </div>
+          </div>
+          <!-- Item 3 -->
+          <div
+            class="glass-panel p-4 rounded-xl flex items-center justify-between"
+          >
+            <div class="flex items-center gap-4">
+              <div
+                class="w-12 h-12 bg-surface-container-highest rounded-lg flex items-center justify-center"
+              >
+                <span
+                  class="material-symbols-outlined text-error"
+                  data-icon="inventory_2"
+                  >inventory_2</span
+                >
+              </div>
+              <div>
+                <h3 class="font-bold text-sm text-on-surface">Toolbox</h3>
+                <div class="flex items-center gap-2 mt-0.5">
+                  <span
+                    class="text-[10px] font-bold bg-error/20 text-error px-1.5 py-0.5 rounded uppercase tracking-tighter"
+                    >BLE lost</span
+                  >
+                  <span class="text-[10px] text-outline font-medium"
+                    >? Zone Unknown</span
+                  >
+                </div>
+              </div>
+            </div>
+            <div class="text-right">
+              <span class="block font-bold text-xs text-on-surface">Hier</span>
+              <span class="block text-[10px] text-error font-bold uppercase"
+                >Perdu</span
+              >
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- Map Preview / Asset Tracking -->
+      <section class="h-48 rounded-2xl overflow-hidden relative shadow-2xl">
+        <img
+          alt="Map location preview"
+          class="w-full h-full object-cover"
+          data-alt="Technical blueprint map of a large industrial factory floor with small blue glowing dots representing asset locations, dark aesthetic"
+          data-location="Industrial Park"
+          src="https://lh3.googleusercontent.com/aida-public/AB6AXuAyih90kcRyhB0XGfAoEL5ISNEfUEAXD6UwcdCL1YJ6sTPdu4SiJa8_7GsYqDOTCmQROYKrZ0EWgdJMTV0RliLgyJbPsnrTONe2XvxoKmU9_1fKXm4BexJRGb7yMKX3FQOrYzX5vdjMaxs2aoc7GNS1p93ThwuNtOU3_b4pyHTx-3ivXulZCsbU9vIqgYVmvZ6F0rHxgLp3h-Ykm8FIqP2ks49C3sZPZlTp07mA11XYALTnpjP2TY4CfR3DVYFw-27K1Q9fi-6VtfNn"
+        />
+        <div
+          class="absolute inset-0 bg-gradient-to-t from-surface to-transparent opacity-60"
+        ></div>
+        <div
+          class="absolute bottom-4 left-4 flex items-center gap-2 bg-surface-container-high/80 backdrop-blur-md px-3 py-1.5 rounded-lg"
+        >
+          <span class="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
+          <span
+            class="text-[10px] font-bold text-on-surface uppercase tracking-widest"
+            >Radar Actif : 124 Signaux</span
+          >
+        </div>
+      </section>
+    </main>
+    <!-- Draggable Bottom Sheet Handle -->
+    <div
+      class="fixed bottom-24 left-1/2 -translate-x-1/2 z-40 px-4 w-full max-w-md"
+    >
+      <div
+        class="w-10 h-1 bg-secondary-fixed-dim/20 rounded-full mx-auto mb-2"
+      ></div>
+    </div>
+    <!-- Floating Action Button -->
+    <div class="fixed bottom-28 right-6 z-50">
+      <button
+        class="w-16 h-16 rounded-full bg-gradient-to-br from-[#adc6ff] to-[#357df1] text-[#002e6a] shadow-[0px_8px_24px_rgba(53,125,241,0.4)] flex items-center justify-center transition-transform duration-200 active:scale-90"
+      >
+        <span
+          class="material-symbols-outlined text-3xl font-bold"
+          data-icon="add"
+          >add</span
+        >
+      </button>
+    </div>
+    <!-- BottomNavBar Execution -->
+    <nav
+      class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-2 bg-[#222a3d]/60 backdrop-blur-[20px] rounded-t-[1.5rem] shadow-[0px_16px_40px_rgba(6,14,32,0.4)]"
+    >
+      <!-- Active Item: Accueil -->
+      <a
+        class="flex flex-col items-center justify-center bg-gradient-to-br from-[#adc6ff] to-[#357df1] text-[#002e6a] rounded-[1.5rem] px-5 py-2 scale-90 duration-150"
+        href="#"
+      >
+        <span
+          class="material-symbols-outlined"
+          data-icon="home"
+          style="font-variation-settings: &quot;FILL&quot; 1"
+          >home</span
+        >
+        <span
+          class="font-['Inter'] text-[10px] font-bold uppercase tracking-widest mt-1"
+          >Accueil</span
+        >
+      </a>
+      <a
+        class="flex flex-col items-center justify-center text-[#909097] px-5 py-2 hover:text-[#adc6ff] transition-all"
+        href="#"
+      >
+        <span class="material-symbols-outlined" data-icon="inventory_2"
+          >inventory_2</span
+        >
+        <span
+          class="font-['Inter'] text-[10px] font-bold uppercase tracking-widest mt-1"
+          >Inventaire</span
+        >
+      </a>
+      <a
+        class="flex flex-col items-center justify-center text-[#909097] px-5 py-2 hover:text-[#adc6ff] transition-all"
+        href="#"
+      >
+        <span class="material-symbols-outlined" data-icon="radar">radar</span>
+        <span
+          class="font-['Inter'] text-[10px] font-bold uppercase tracking-widest mt-1"
+          >Radar</span
+        >
+      </a>
+      <a
+        class="flex flex-col items-center justify-center text-[#909097] px-5 py-2 hover:text-[#adc6ff] transition-all"
+        href="#"
+      >
+        <span class="material-symbols-outlined" data-icon="notifications_active"
+          >notifications_active</span
+        >
+        <span
+          class="font-['Inter'] text-[10px] font-bold uppercase tracking-widest mt-1"
+          >Alertes</span
+        >
+      </a>
+      <a
+        class="flex flex-col items-center justify-center text-[#909097] px-5 py-2 hover:text-[#adc6ff] transition-all"
+        href="#"
+      >
+        <span class="material-symbols-outlined" data-icon="person">person</span>
+        <span
+          class="font-['Inter'] text-[10px] font-bold uppercase tracking-widest mt-1"
+          >Profil</span
+        >
+      </a>
+    </nav>
+  </body>
+</html>

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ToolTracker Pro - Détails de l'outil</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-primary": "#002e6a",
+                        "on-secondary-fixed-variant": "#3f465c",
+                        "surface-container-highest": "#2d3449",
+                        "on-surface-variant": "#c6c6cd",
+                        "tertiary-fixed": "#6ffbbe",
+                        "inverse-primary": "#005ac2",
+                        "surface-container": "#171f33",
+                        "secondary-container": "#3f465c",
+                        "outline": "#909097",
+                        "tertiary-fixed-dim": "#4edea3",
+                        "inverse-surface": "#dae2fd",
+                        "on-primary-fixed-variant": "#004395",
+                        "inverse-on-surface": "#283044",
+                        "surface-bright": "#31394d",
+                        "primary-fixed": "#d8e2ff",
+                        "surface-container-lowest": "#060e20",
+                        "on-tertiary-fixed-variant": "#005236",
+                        "secondary-fixed-dim": "#bec6e0",
+                        "on-error": "#690005",
+                        "surface-variant": "#2d3449",
+                        "primary-fixed-dim": "#adc6ff",
+                        "on-tertiary": "#003824",
+                        "error": "#ffb4ab",
+                        "surface-dim": "#0b1326",
+                        "surface-container-high": "#222a3d",
+                        "primary-container": "#00163a",
+                        "on-background": "#dae2fd",
+                        "surface-container-low": "#131b2e",
+                        "tertiary": "#4edea3",
+                        "primary": "#adc6ff",
+                        "surface-tint": "#adc6ff",
+                        "on-secondary-container": "#adb4ce",
+                        "on-tertiary-container": "#009365",
+                        "on-primary-container": "#357df1",
+                        "on-secondary-fixed": "#131b2e",
+                        "error-container": "#93000a",
+                        "tertiary-container": "#001c10",
+                        "outline-variant": "#45464d",
+                        "background": "#0b1326",
+                        "on-secondary": "#283044",
+                        "on-surface": "#dae2fd",
+                        "on-tertiary-fixed": "#002113",
+                        "on-error-container": "#ffdad6",
+                        "secondary-fixed": "#dae2fd",
+                        "on-primary-fixed": "#001a42",
+                        "secondary": "#bec6e0",
+                        "surface": "#0b1326"
+                    },
+                    fontFamily: {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .glass-header {
+            background: rgba(11, 19, 38, 0.6);
+            backdrop-filter: blur(20px);
+        }
+        .bottom-sheet {
+            background: rgba(11, 19, 38, 0.85);
+            backdrop-filter: blur(32px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background font-body text-on-surface antialiased select-none">
+<!-- Top Navigation Bar (Hidden on Mobile) -->
+<nav class="fixed top-0 w-full z-50 glass-header flex justify-between items-center px-6 h-16 max-w-none">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-blue-200 cursor-pointer active:scale-95 duration-200">arrow_back_ios_new</span>
+<span class="font-headline font-bold tracking-tight text-xl text-blue-100">Détails de l'outil</span>
+</div>
+<div class="flex items-center gap-6">
+<span class="material-symbols-outlined text-blue-200 cursor-pointer active:scale-95 duration-200">favorite</span>
+<span class="material-symbols-outlined text-blue-200 cursor-pointer active:scale-95 duration-200">settings</span>
+</div>
+</nav>
+<main class="relative min-h-screen pb-40">
+<!-- Hero Section -->
+<section class="relative w-full h-[320px] overflow-hidden">
+<img alt="Bosch Professional Drill" class="w-full h-full object-cover" data-alt="Professional blue Bosch power drill on a dark industrial workbench with cinematic blue lighting and shallow depth of field" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAL4mRGkygPuza33-O66QWR-CYFIkHyMTV5u4sqdFQ8hTfrR4yUGHKkxKWxGB1zptnD1eQg_itr_V-SXtpbOu1KTUbjCv6N3SIwDk3rRx5QZYTJ1tyvxVSX5wnzFNm489_XwdzpBeXbvwl0lzcyMd3vW2IxM3hZyAHJgbWxW6dRr58sCGIaZFM258RTcMG_CgEB_ERRNJdXruet_qQlnljPoJm8ut4N3CpynnB4uwhep21SFkot18wA52XVn80Opb-BNm44YMQoLdug"/>
+<!-- Hero Gradient Overlay -->
+<div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
+<!-- Hero Content -->
+<div class="absolute bottom-12 left-0 w-full px-6 flex justify-between items-end">
+<div class="space-y-1">
+<p class="font-label text-xs font-bold uppercase tracking-widest text-primary-fixed-dim">Électroportatif</p>
+<h1 class="font-headline text-3xl font-extrabold text-white tracking-tight">Perceuse Bosch GSR 18V</h1>
+</div>
+<div class="p-3 bg-surface-container-high/40 rounded-full backdrop-blur-md active:scale-90 duration-150 cursor-pointer">
+<span class="material-symbols-outlined text-error" data-weight="fill" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</div>
+</div>
+</section>
+<!-- Draggable Bottom Sheet Simulation -->
+<section class="bottom-sheet fixed bottom-0 left-0 right-0 h-[574px] rounded-t-[32px] shadow-2xl overflow-y-auto z-40 border-t border-outline-variant/10">
+<!-- Drag Handle -->
+<div class="flex justify-center pt-4 pb-2">
+<div class="w-10 h-1 rounded-full bg-secondary-fixed-dim/20"></div>
+</div>
+<div class="px-6 py-4 space-y-8">
+<!-- Quick Actions -->
+<div class="flex justify-between items-center gap-2">
+<div class="flex flex-col items-center gap-2 flex-1 group">
+<div class="w-14 h-14 rounded-full bg-primary-container flex items-center justify-center text-primary-fixed-dim active:scale-90 transition-all">
+<span class="material-symbols-outlined text-2xl">location_on</span>
+</div>
+<span class="font-label text-[10px] font-bold uppercase text-on-surface-variant">Localiser</span>
+</div>
+<div class="flex flex-col items-center gap-2 flex-1">
+<div class="w-14 h-14 rounded-full bg-surface-container-highest flex items-center justify-center text-on-surface active:scale-90 transition-all">
+<span class="material-symbols-outlined text-2xl">qr_code_scanner</span>
+</div>
+<span class="font-label text-[10px] font-bold uppercase text-on-surface-variant">Check-out</span>
+</div>
+<div class="flex flex-col items-center gap-2 flex-1">
+<div class="w-14 h-14 rounded-full bg-surface-container-highest flex items-center justify-center text-on-surface active:scale-90 transition-all">
+<span class="material-symbols-outlined text-2xl">edit</span>
+</div>
+<span class="font-label text-[10px] font-bold uppercase text-on-surface-variant">Modifier</span>
+</div>
+<div class="flex flex-col items-center gap-2 flex-1">
+<div class="w-14 h-14 rounded-full bg-surface-container-highest flex items-center justify-center text-on-surface active:scale-90 transition-all">
+<span class="material-symbols-outlined text-2xl">report_problem</span>
+</div>
+<span class="font-label text-[10px] font-bold uppercase text-on-surface-variant">Signaler</span>
+</div>
+</div>
+<!-- Info Cards Grid -->
+<div class="grid grid-cols-2 gap-3">
+<div class="bg-surface-container-low p-4 rounded-xl space-y-2">
+<p class="font-label text-[10px] font-bold uppercase text-on-surface-variant">Statut</p>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+<span class="font-body font-semibold text-tertiary">Disponible</span>
+</div>
+</div>
+<div class="bg-surface-container-low p-4 rounded-xl space-y-2">
+<p class="font-label text-[10px] font-bold uppercase text-on-surface-variant">Localisation</p>
+<p class="font-body font-semibold truncate text-on-surface">Bâtiment A · Labo 3</p>
+</div>
+<div class="bg-surface-container-low p-4 rounded-xl space-y-2">
+<p class="font-label text-[10px] font-bold uppercase text-on-surface-variant">Attribution</p>
+<p class="font-body font-semibold text-on-surface">Jean Dupont</p>
+</div>
+<div class="bg-surface-container-low p-4 rounded-xl space-y-2">
+<p class="font-label text-[10px] font-bold uppercase text-on-surface-variant">Valeur</p>
+<p class="font-body font-semibold text-on-surface">€149.00</p>
+</div>
+</div>
+<!-- Technology Badges -->
+<div class="space-y-4">
+<h3 class="font-headline font-bold text-sm text-on-surface tracking-wide uppercase">Connectivité Industrielle</h3>
+<div class="space-y-3">
+<div class="flex items-center justify-between p-4 bg-surface-container-high rounded-xl">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">nfc</span>
+<div>
+<p class="font-body font-bold text-sm">Puce RFID</p>
+<p class="font-body text-xs text-on-surface-variant">Configuré &amp; Actif</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div class="flex items-center justify-between p-4 bg-surface-container-high rounded-xl">
+<div class="flex items-center gap-3 text-on-surface-variant">
+<span class="material-symbols-outlined">bluetooth</span>
+<div>
+<p class="font-body font-bold text-sm">Balise BLE</p>
+<p class="font-body text-xs">Non équipé</p>
+</div>
+</div>
+<button class="px-4 py-1.5 bg-primary-container text-primary-fixed-dim rounded-full text-xs font-bold active:scale-95 transition-all">
+                                AJOUTER
+                            </button>
+</div>
+</div>
+</div>
+<!-- Movement History -->
+<div class="space-y-4">
+<h3 class="font-headline font-bold text-sm text-on-surface tracking-wide uppercase">Historique Mouvements</h3>
+<div class="relative space-y-6 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-surface-container-highest">
+<div class="relative pl-8 flex justify-between items-start">
+<span class="absolute left-0 top-1 w-[24px] h-[24px] bg-surface-container-highest rounded-full border-4 border-background flex items-center justify-center z-10"></span>
+<div>
+<p class="font-body font-bold text-sm">Check-in</p>
+<p class="font-body text-xs text-on-surface-variant">Retourné par Jean Dupont</p>
+</div>
+<span class="font-label text-[10px] text-on-surface-variant pt-1">AUJOURD'HUI 09:15</span>
+</div>
+<div class="relative pl-8 flex justify-between items-start">
+<span class="absolute left-0 top-1 w-[24px] h-[24px] bg-surface-container-highest rounded-full border-4 border-background flex items-center justify-center z-10"></span>
+<div>
+<p class="font-body font-bold text-sm">Check-out</p>
+<p class="font-body text-xs text-on-surface-variant">Emprunté par Marc V.</p>
+</div>
+<span class="font-label text-[10px] text-on-surface-variant pt-1">HIER 14:30</span>
+</div>
+</div>
+</div>
+<!-- Destructive Actions -->
+<div class="pt-4 pb-8">
+<button class="w-full py-4 text-error font-bold text-sm uppercase tracking-widest bg-error-container/10 rounded-xl active:bg-error-container/20 transition-all">
+                        Marquer comme perdu
+                    </button>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Nav Bar (Mobile Navigation Component) -->
+<div class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-slate-900/60 backdrop-blur-xl border-t border-slate-700/20 shadow-2xl shadow-slate-950 md:hidden rounded-t-2xl">
+<div class="flex flex-col items-center justify-center bg-blue-500/20 text-blue-300 rounded-xl px-4 py-1.5 active:scale-90 duration-150 transition-all">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span class="font-inter text-[10px] font-bold uppercase tracking-wider">Inventaire</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-500 px-4 py-1.5 hover:text-blue-200 active:scale-90 duration-150 transition-all">
+<span class="material-symbols-outlined" data-icon="notifications_active">notifications_active</span>
+<span class="font-inter text-[10px] font-bold uppercase tracking-wider">Alertes</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-500 px-4 py-1.5 hover:text-blue-200 active:scale-90 duration-150 transition-all">
+<span class="material-symbols-outlined" data-icon="distance">distance</span>
+<span class="font-inter text-[10px] font-bold uppercase tracking-wider">Localisation</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-500 px-4 py-1.5 hover:text-blue-200 active:scale-90 duration-150 transition-all">
+<span class="material-symbols-outlined" data-icon="person_gear">person</span>
+<span class="font-inter text-[10px] font-bold uppercase tracking-wider">Profil</span>
+</div>
+</div>
+</body></html>

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Inventaire - ToolTracker Pro</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-primary": "#002e6a",
+              "on-secondary-fixed-variant": "#3f465c",
+              "surface-container-highest": "#1E293B",
+              "on-surface-variant": "#94A3B8",
+              "tertiary-fixed": "#6ffbbe",
+              "inverse-primary": "#005ac2",
+              "surface-container": "#0F172A",
+              "secondary-container": "#1E293B",
+              "outline": "#64748B",
+              "tertiary-fixed-dim": "#4edea3",
+              "inverse-surface": "#F1F5F9",
+              "on-primary-fixed-variant": "#004395",
+              "inverse-on-surface": "#0F172A",
+              "surface-bright": "#334155",
+              "primary-fixed": "#D1E9FF",
+              "surface-container-lowest": "#020617",
+              "on-tertiary-fixed-variant": "#005236",
+              "secondary-fixed-dim": "#94A3B8",
+              "on-error": "#ffffff",
+              "surface-variant": "#1E293B",
+              "primary-fixed-dim": "#93C5FD",
+              "on-tertiary": "#003824",
+              "error": "#F87171",
+              "surface-dim": "#0F172A",
+              "surface-container-high": "#1E293B",
+              "on-background": "#F1F5F9",
+              "surface-container-low": "#0F172A",
+              "tertiary": "#10B981",
+              "primary": "#3B82F6",
+              "surface-tint": "#3B82F6",
+              "on-secondary-container": "#94A3B8",
+              "on-tertiary-container": "#10B981",
+              "on-primary-container": "#60A5FA",
+              "on-secondary-fixed": "#0F172A",
+              "error-container": "#7F1D1D",
+              "tertiary-container": "#064E3B",
+              "outline-variant": "#334155",
+              "background": "#0F172A",
+              "on-secondary": "#94A3B8",
+              "on-surface": "#F1F5F9",
+              "on-tertiary-fixed": "#064E3B",
+              "on-error-container": "#FEE2E2",
+              "secondary-fixed": "#F1F5F9",
+              "on-primary-fixed": "#001a42",
+              "secondary": "#64748B",
+              "surface": "#0F172A"
+            },
+            fontFamily: {
+              "headline": ["Manrope", "sans-serif"],
+              "body": ["Manrope", "sans-serif"],
+              "label": ["Manrope", "sans-serif"],
+              "manrope": ["Manrope", "sans-serif"]
+            },
+            borderRadius: {
+              "DEFAULT": "8px",
+              "lg": "8px",
+              "xl": "8px",
+              "2xl": "8px",
+              "full": "9999px"
+            },
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .glass-card {
+        background: rgba(30, 41, 59, 0.4);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      body {
+        background-color: #0F172A;
+        color: #F1F5F9;
+      }
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="font-body selection:bg-primary selection:text-on-primary min-h-screen">
+<!-- TopAppBar Shared Component (COMPONENTS_8) -->
+<header class="fixed top-0 w-full z-50 bg-slate-900/60 backdrop-blur-xl flex justify-between items-center px-6 h-16 w-full max-w-none">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-blue-200 dark:text-blue-100 active:scale-95 duration-200" data-icon="settings">settings</span>
+<h1 class="font-manrope font-bold tracking-tight text-xl font-bold text-blue-100">Inventaire</h1>
+</div>
+<div class="w-8 h-8 rounded-full bg-slate-800/40 flex items-center justify-center overflow-hidden border border-slate-700/20">
+<img alt="Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBVGDIMuxkL7qySDAUYBxoeE0mgRrPyDk2Or_T5K60IsArzRPT0Qj5x8BN9rq_29npHW_c6pmoQT6jdPy7YuaRX1nyXKi1FEmJ8PiK8R2YwXv353vV1xaP2NNMT2BVpVxlybskHk4JFDZxnOvUcdtN0e6yDFRRxs6WFviwe1dkfDYDuE4d--aVwszoMaAIArP8KTr8XMU5IWLKdw3aoyKCr4BOr_GhfXJ6tB1OC7xdrFjoKh8NqGZAE0jluRRuENUiER_6hcTz55mKL"/>
+</div>
+</header>
+<main class="pt-24 pb-32 px-6 max-w-2xl mx-auto">
+<!-- Header Section -->
+<section class="mb-8">
+<h2 class="font-headline text-4xl font-extrabold tracking-tight text-on-surface">Inventaire</h2>
+<p class="font-label text-xs font-bold uppercase tracking-widest text-primary mt-2">127 OUTILS · 3 CATÉGORIES</p>
+</section>
+<!-- Search & Filter Area -->
+<section class="space-y-6 mb-10">
+<!-- Search Bar -->
+<div class="relative flex items-center gap-3">
+<div class="relative flex-1">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline" data-icon="search">search</span>
+<input class="w-full bg-surface-container-high border-none rounded-lg py-3.5 pl-12 pr-4 text-on-surface placeholder:text-outline focus:ring-2 focus:ring-primary/40 text-sm" placeholder="Rechercher un outil..." type="text"/>
+</div>
+<button class="bg-surface-container-high p-3.5 rounded-lg text-on-surface active:scale-95 transition-transform">
+<span class="material-symbols-outlined" data-icon="tune">tune</span>
+</button>
+</div>
+<!-- Filter Chips -->
+<div class="flex gap-3 overflow-x-auto no-scrollbar -mx-6 px-6">
+<button class="flex-none px-6 py-2 rounded-lg bg-primary text-white font-bold text-sm">Tous</button>
+<button class="flex-none px-6 py-2 rounded-lg bg-surface-container-high text-on-surface-variant font-semibold text-sm hover:bg-surface-bright transition-colors">RFID</button>
+<button class="flex-none px-6 py-2 rounded-lg bg-surface-container-high text-on-surface-variant font-semibold text-sm hover:bg-surface-bright transition-colors">BLE</button>
+<button class="flex-none px-6 py-2 rounded-lg bg-surface-container-high text-on-surface-variant font-semibold text-sm hover:bg-surface-bright transition-colors">RFID+BLE</button>
+</div>
+</section>
+<!-- Grouped List -->
+<section class="space-y-8">
+<div class="space-y-4">
+<div class="flex items-center justify-between border-b border-slate-800 pb-2">
+<h3 class="font-headline text-lg font-bold text-on-surface">Électroportatif</h3>
+<span class="text-[10px] font-bold text-outline uppercase tracking-widest">42 Outils</span>
+</div>
+<!-- Tool Card 1 -->
+<div class="glass-card rounded-lg p-4 flex gap-4 items-center group active:scale-[0.98] transition-all cursor-pointer">
+<div class="w-16 h-16 rounded-lg bg-slate-800/60 flex items-center justify-center relative overflow-hidden border border-slate-700/30">
+<img alt="Bosch Drill" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDgOBEyS0tfcKzdV28d5u_pu_0u0lWomrmaLzRWx9RbIZYHwFZV4gXu0BUVVRdLpOPxhvoqNErq-9mU5sDkOiE_GoElBX97CE1JDb4m3JjkvM7oHbUoK90CNs5a7D64L89I32IlmIrEWyMyn8Cq2OJ-AyrNx32b0bLOn9jxdVXDoFm7bh5KKeGESVqoGL_8GXLHxQoR58quH52ayq6OacT12KyeCGI6EmPjMhemeOYIu-yFBnLsHriAtJk-yfisf-tT9QybW_IDG4rg"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between mb-0.5">
+<h4 class="font-bold text-on-surface truncate text-sm">Perceuse Bosch GSR</h4>
+<span class="material-symbols-outlined text-outline text-lg" data-icon="chevron_right">chevron_right</span>
+</div>
+<div class="flex items-center justify-between mb-2">
+<p class="text-[10px] font-mono text-outline uppercase">GSR-2024-001</p>
+<p class="text-[10px] font-bold text-on-surface">249.00 €</p>
+</div>
+<div class="flex items-center gap-2">
+<span class="inline-flex items-center px-2 py-0.5 rounded-sm bg-tertiary-container text-tertiary text-[9px] font-extrabold uppercase tracking-wider">
+<span class="material-symbols-outlined text-[10px] mr-1" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>Disponible
+                            </span>
+<div class="flex gap-1.5 ml-auto">
+<span class="text-[9px] font-bold text-primary px-1.5 py-0.5 bg-primary/10 rounded-sm border border-primary/20">RFID</span>
+<span class="text-[9px] font-bold text-outline-variant px-1.5 py-0.5 bg-outline-variant/10 rounded-sm">BLE</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Tool Card 2 -->
+<div class="glass-card rounded-lg p-4 flex gap-4 items-center group active:scale-[0.98] transition-all cursor-pointer">
+<div class="w-16 h-16 rounded-lg bg-slate-800/60 flex items-center justify-center relative overflow-hidden border border-slate-700/30">
+<img alt="Angle Grinder" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBWTnlrtSW5vznA1Xh_Phz856xSdNJ3-G4_bEufryvg6-Wg7DbJzsbI2b67DZD7jMs1_7nKVrD9BtPJWUv9AGS1uvwzoSWpliQJ71B-2i8xLAT5-Z8HR-wFB-R1jwzYikHdueA1Kk_7HbPVec25rKQN5vasN9Q8nvmk6APnQcesHiKW3pR6O6gIBXaneWv7jXr5Hh5c4OeDQDXpsRLBcCiXsZ9-ohyIMA-plovEzUdjN0Gp9nqS_GpvJoZGxwDyYay8p5MKLZYQNeJH"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between mb-0.5">
+<h4 class="font-bold text-on-surface truncate text-sm">Meuleuse Makita XAG</h4>
+<span class="material-symbols-outlined text-outline text-lg" data-icon="chevron_right">chevron_right</span>
+</div>
+<div class="flex items-center justify-between mb-2">
+<p class="text-[10px] font-mono text-outline uppercase">XAG-992-B8</p>
+<p class="text-[10px] font-bold text-on-surface">185.50 €</p>
+</div>
+<div class="flex items-center gap-2">
+<span class="inline-flex items-center px-2 py-0.5 rounded-sm bg-blue-900/40 text-blue-300 text-[9px] font-extrabold uppercase tracking-wider">
+<span class="material-symbols-outlined text-[10px] mr-1" data-icon="sync" style="font-variation-settings: 'FILL' 0;">sync</span>En utilisation
+                            </span>
+<div class="flex gap-1.5 ml-auto">
+<span class="text-[9px] font-bold text-primary px-1.5 py-0.5 bg-primary/10 rounded-sm border border-primary/20">RFID</span>
+<span class="text-[9px] font-bold text-primary px-1.5 py-0.5 bg-primary/10 rounded-sm border border-primary/20">BLE</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Tool Card 3 -->
+<div class="glass-card rounded-lg p-4 flex gap-4 items-center group active:scale-[0.98] transition-all cursor-pointer">
+<div class="w-16 h-16 rounded-lg bg-slate-800/60 flex items-center justify-center relative overflow-hidden border border-slate-700/30">
+<img alt="Measuring Tool" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCzZHiJELNEvZ9Nhkd6enMfsA5LNbh8MjoCvjSN4brZpys1Q8GVculiMJNQWturMPAMLaZ2o6sAvJzz2a9GFd1A20hrZah-NC61lIq1uq-XrguK4btxe0YvJMM9CT_e48Cm-TBwK73NQzSfnatJmtQofn_IqkkTOOxefBSJFRkAdmRUe-uGwJ9FbrxUmCQAeBRLMYkiSIFaVw4oOITZgX5Uj0QB4PmZ3khT6pZcddJRGVFNEgBWb4gDJ5rncKaHiZd0ZZg8TB5BBVAc"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between mb-0.5">
+<h4 class="font-bold text-on-surface truncate text-sm">Laser Leica Disto</h4>
+<span class="material-symbols-outlined text-outline text-lg" data-icon="chevron_right">chevron_right</span>
+</div>
+<div class="flex items-center justify-between mb-2">
+<p class="text-[10px] font-mono text-outline uppercase">LD-2023-F2</p>
+<p class="text-[10px] font-bold text-on-surface">420.00 €</p>
+</div>
+<div class="flex items-center gap-2">
+<span class="inline-flex items-center px-2 py-0.5 rounded-sm bg-error-container text-error text-[9px] font-extrabold uppercase tracking-wider">
+<span class="material-symbols-outlined text-[10px] mr-1" data-icon="warning" style="font-variation-settings: 'FILL' 1;">warning</span>Maintenance
+                            </span>
+<div class="flex gap-1.5 ml-auto">
+<span class="text-[9px] font-bold text-outline-variant px-1.5 py-0.5 bg-outline-variant/10 rounded-sm">RFID</span>
+<span class="text-[9px] font-bold text-primary px-1.5 py-0.5 bg-primary/10 rounded-sm border border-primary/20">BLE</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="space-y-4">
+<div class="flex items-center justify-between border-b border-slate-800 pb-2">
+<h3 class="font-headline text-lg font-bold text-on-surface">Mesure &amp; Traçage</h3>
+<span class="text-[10px] font-bold text-outline uppercase tracking-widest">15 Outils</span>
+</div>
+<div class="h-24 glass-card rounded-lg flex items-center justify-center border border-dashed border-slate-700/50">
+<p class="text-outline text-xs font-medium italic">Faites défiler pour voir plus...</p>
+</div>
+</div>
+</section>
+</main>
+<!-- FAB -->
+<button class="fixed right-6 bottom-28 w-14 h-14 bg-primary rounded-lg shadow-xl shadow-blue-900/20 flex items-center justify-center text-white active:scale-90 transition-transform z-40">
+<span class="material-symbols-outlined text-3xl" data-icon="add">add</span>
+</button>
+<!-- BottomNavBar Shared Component (COMPONENTS_8) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-slate-900/60 backdrop-blur-xl border-t border-slate-700/20 shadow-2xl shadow-slate-950 rounded-t-2xl">
+<a class="flex flex-col items-center justify-center bg-blue-500/20 text-blue-300 rounded-lg px-4 py-1.5 active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="inventory_2" style="font-variation-settings: 'FILL' 1;">inventory_2</span>
+<span class="font-inter text-[10px] font-bold uppercase tracking-wider">Inventaire</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-500 px-4 py-1.5 hover:text-blue-200 transition-all active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="notifications_active">notifications_active</span>
+<span class="font-inter text-[10px] font-bold uppercase tracking-wider">Alertes</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-500 px-4 py-1.5 hover:text-blue-200 transition-all active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="distance">distance</span>
+<span class="font-inter text-[10px] font-bold uppercase tracking-wider">Localisation</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-500 px-4 py-1.5 hover:text-blue-200 transition-all active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="person_gear">person</span>
+<span class="font-inter text-[10px] font-bold uppercase tracking-wider">Profil</span>
+</a>
+</nav>
+</body></html>
