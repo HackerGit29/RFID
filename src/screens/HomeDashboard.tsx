@@ -1,71 +1,88 @@
+import React, { useState } from 'react';
 import BottomNav from '../components/BottomNav';
 import TopBar from '../components/TopBar';
 import SearchBar from '../components/SearchBar';
 import StatCard from '../components/StatCard';
-import { StatCard as StatCardType, Movement } from '../types';
+import { StatCard as StatCardType, Tool } from '../types';
+import ActivityFeed from '../components/Dashboard/ActivityFeed';
+import ToolStateManager from '../components/Dashboard/ToolStateManager';
+import { useRealtimeMovements } from '../hooks/useRealtimeMovements';
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_ANON_KEY
+);
 
 const stats: StatCardType[] = [
   { label: 'Outils totaux', value: 127, trend: 12, icon: 'inventory_2', color: 'border-primary' },
   { label: 'En utilisation', value: 23, trend: -5, icon: 'person', color: 'border-on-primary-container' },
-  { label: 'À localiser', value: 5, trend: undefined, icon: 'warning', color: 'border-error' },
-];
-
-const movements: Movement[] = [
-  {
-    id: '1',
-    toolId: '1',
-    toolName: 'Bosch Drill',
-    toolIcon: 'handyman',
-    type: 'RFID_OUT',
-    user: 'Jean D.',
-    timestamp: '09:15',
-    status: 'active',
-  },
-  {
-    id: '2',
-    toolId: '2',
-    toolName: 'Oscilloscope',
-    toolIcon: 'precision_manufacturing',
-    type: 'BLE_DETECTED',
-    location: 'Lab 2',
-    timestamp: '08:42',
-    status: 'stable',
-  },
-  {
-    id: '3',
-    toolId: '3',
-    toolName: 'Toolbox',
-    toolIcon: 'inventory_2',
-    type: 'BLE_LOST',
-    location: 'Zone Unknown',
-    timestamp: 'Hier',
-    status: 'lost',
-  },
+  { label: 'Alertes Actives', value: 5, trend: undefined, icon: 'warning', color: 'border-error' },
 ];
 
 export default function HomeDashboard() {
+  const { movements, lastAlert } = useRealtimeMovements();
+  const [tools, setTools] = useState<Tool[]>([]);
+
+  // Load initial tools for state manager
+  React.useEffect(() => {
+    async function loadTools() {
+      const { data } = await supabase.from('tools').select('*');
+      if (data) setTools(data);
+    }
+    loadTools();
+  }, []);
+
+  async function handleToggleState(id: string, newState: 'authorized' | 'locked') {
+    const { error } = await supabase
+      .from('tools')
+      .update({ state: newState })
+      .eq('id', id);
+
+    if (!error) {
+      setTools(prev => prev.map(t => t.id === id ? { ...t, state: newState } : t));
+    }
+  }
+
   return (
     <div className="bg-surface text-on-surface min-h-screen pb-32">
       <TopBar
         title=""
         showNotifications
-        notificationCount={1}
+        notificationCount={movements.filter(m => !m.authorized).length}
         showThemeToggle
       />
 
       <main className="mt-20 px-6 space-y-8">
-        {/* Search Bar */}
+        {/* Critical Alert Banner */}
+        {lastAlert && (
+          <div className="bg-red-500/20 border border-red-500/50 p-4 rounded-xl flex items-center gap-3 animate-pulse shadow-[0_0_15px_rgba(239,68,68,0.3)]">
+            <span className="material-symbols-outlined text-red-500">warning</span>
+            <div className="flex-1">
+              <p className="text-red-400 text-xs font-bold uppercase tracking-widest">Alerte de Sécurité</p>
+              <p className="text-on-surface text-sm font-medium">
+                {lastAlert.toolName} détecté au {lastAlert.checkpointId} sans autorisation !
+              </p>
+            </div>
+            <button
+              onClick={() => {
+                alert('Alerte acquittée');
+              }}
+              className="px-3 py-1.5 rounded-lg bg-red-500 text-white text-[10px] font-bold uppercase hover:bg-red-600 transition-colors"
+            >
+              Acquitter
+            </button>
+          </div>
+        )}
+
         <SearchBar showFilter />
 
-        {/* Quick Stats Horizontal Scroll */}
+        {/* KPI Stats */}
         <section>
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-headline text-lg font-bold text-on-surface">
               Indicateurs Temps Réel
             </h2>
-            <span className="text-xs text-primary font-bold tracking-wider uppercase cursor-pointer">
-              Voir tout
-            </span>
           </div>
           <div className="flex gap-4 overflow-x-auto hide-scrollbar pb-4 -mx-6 px-6">
             {stats.map((stat) => (
@@ -74,87 +91,48 @@ export default function HomeDashboard() {
           </div>
         </section>
 
-        {/* Recent Movements */}
-        <section className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="font-headline text-lg font-bold text-on-surface">
-              Mouvements Récents
-            </h2>
-            <span className="material-symbols-outlined text-outline cursor-pointer">history</span>
-          </div>
-          <div className="space-y-3">
-            {movements.map((movement) => (
-              <div
-                key={movement.id}
-                className="glass-panel p-4 rounded-xl flex items-center justify-between cursor-pointer active:scale-[0.98] transition-transform"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-surface-container-highest rounded-lg flex items-center justify-center">
-                    <span className="material-symbols-outlined text-primary">
-                      {movement.toolIcon}
-                    </span>
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-sm text-on-surface">{movement.toolName}</h3>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-tighter ${
-                        movement.type === 'RFID_OUT' ? 'bg-tertiary/20 text-tertiary' :
-                        movement.type === 'BLE_DETECTED' ? 'bg-on-primary-container/20 text-on-primary-container' :
-                        'bg-error/20 text-error'
-                      }`}>
-                        {movement.type}
-                      </span>
-                      <span className="text-[10px] text-outline font-medium">
-                        {movement.user || movement.location}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <span className="block font-bold text-xs text-on-surface">{movement.timestamp}</span>
-                  <span className={`block text-[10px] font-bold uppercase ${
-                    movement.status === 'active' ? 'text-tertiary' :
-                    movement.status === 'stable' ? 'text-on-primary-container' :
-                    'text-error'
-                  }`}>
-                    {movement.status === 'active' ? 'Actif' : movement.status === 'stable' ? 'Stable' : 'Perdu'}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Real-time Feed */}
+          <section className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="font-headline text-lg font-bold text-on-surface">
+                Flux d'Activité RFID
+              </h2>
+              <span className="material-symbols-outlined text-outline cursor-pointer">history</span>
+            </div>
+            <ActivityFeed movements={movements} />
+          </section>
+
+          {/* Admin State Manager */}
+          <section className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="font-headline text-lg font-bold text-on-surface">
+                Gestion des États
+              </h2>
+              <span className="text-xs text-primary font-bold uppercase cursor-pointer">Actualiser</span>
+            </div>
+            <ToolStateManager tools={tools} onToggleState={handleToggleState} />
+          </section>
+        </div>
 
         {/* Map Preview */}
-        <section className="h-48 rounded-2xl overflow-hidden relative shadow-2xl">
+        <section className="h-48 rounded-2xl overflow-hidden relative shadow-2xl mt-8">
           <img
             alt="Map location preview"
             className="w-full h-full object-cover"
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAyih90kcRyhB0XGfAoEL5ISNEfUEAXD6UwcdCL1YJ6sTPdu4SiJa8_7GsYqDOTCmQROYKrZ0EWgdJMTV0RliLgyJbPsnrTONe2XvxoKmU9_1fKXm4BexJRGb7yMKX3FQOrYzX5vdjMaxs2aoc7GNS1p93ThwuNtOU3_b4pyHTx-3ivXulZCsbU9vIqgYVmvZ6F0rHxgLp3h-Ykm8FIqP2ks49C3sZPZlTp07mA11XYALTnpjP2TY4CfR3DVYFw-27K1Q9fi-6VtfNn"
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAyih90kcRyhB0XGfAoEL5ISNEfUEAXD6UwcdCL1YJ6sTPdu4SiJa8_7GsYqDOTCmQROYKrZ0EWgdJMTV0RliLgyJbPsnrTONe2XvxoKmU9_1fKXm4BexJRGb7yMKX3FQOrYzX5vdjMaxs2aoc7GNS1p93ThwuNtOU3_b4pyHT-3ivXulZCsbU9vIqgYVmvZ6F0rHxgLp3h-Ykm8FIqP2ks49C3sZPZlTp07mA11XYALTnpjP2TY4CfR3DVYFw-27K1Q9fi-6VtfNn"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-surface to-transparent opacity-60"></div>
           <div className="absolute bottom-4 left-4 flex items-center gap-2 bg-surface-container-high/80 backdrop-blur-md px-3 py-1.5 rounded-lg">
             <span className="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
             <span className="text-[10px] font-bold text-on-surface uppercase tracking-widest">
-              Radar Actif : 124 Signaux
+              Radar Actif : {movements.length} Signaux
             </span>
           </div>
         </section>
       </main>
 
-      {/* Floating Action Button */}
-      <div className="fixed bottom-28 right-6 z-50">
-        <button className="w-16 h-16 rounded-full bg-gradient-to-br from-[#adc6ff] to-[#357df1] text-[#002e6a] shadow-[0px_8px_24px_rgba(53,125,241,0.4)] flex items-center justify-center transition-transform duration-200 active:scale-90">
-          <span className="material-symbols-outlined text-3xl font-bold">add</span>
-        </button>
-      </div>
-
-      {/* Draggable Bottom Sheet Handle */}
-      <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-40 px-4 w-full max-w-md">
-        <div className="w-10 h-1 bg-secondary-fixed-dim/20 rounded-full mx-auto mb-2"></div>
-      </div>
-
-      {/* Bottom Navigation */}
       <BottomNav activeTab="home" />
     </div>
   );
