@@ -32,7 +32,7 @@ The app combines both technologies to provide comprehensive tool tracking with:
 | **Maps** | Leaflet + React Leaflet | 5.0.0 |
 | **Mobile Runtime** | Capacitor | 6.x |
 | **Build Tool** | Vite | latest |
-| **Backend** | Supabase (planned) | - |
+| **Backend** | Supabase | 2.103.0 |
 | **Hardware** | ESP32 + RC522 (RFID), BLE Beacons | - |
 
 ---
@@ -40,7 +40,7 @@ The app combines both technologies to provide comprehensive tool tracking with:
 ## 🏗️ Project Structure
 
 ```
-prototype-validation-docs/
+RFID/
 ├── src/
 │   ├── screens/              # Full screen components (5 implemented)
 │   │   ├── SplashScreen.tsx
@@ -48,28 +48,21 @@ prototype-validation-docs/
 │   │   ├── InventoryList.tsx
 │   │   ├── ToolDetail.tsx
 │   │   └── BLERadar.tsx
-│   ├── components/           # Reusable components (9 created)
-│   │   ├── BottomNav.tsx
-│   │   ├── FilterChips.tsx
-│   │   ├── LeafletMap.tsx    # OpenStreetMap integration
-│   │   ├── SearchBar.tsx
-│   │   ├── StatCard.tsx
-│   │   ├── SwipeGesture.tsx  # Swipe-to-go-back
-│   │   ├── ThemeToggle.tsx   # Light/Dark mode switch
-│   │   ├── ToolCard.tsx
-│   │   └── TopBar.tsx
-│   ├── contexts/             # React Context providers
+│   ├── components/           # Reusable components
+│   ├── contexts/             # React Context providers (5 contexts)
 │   │   ├── ThemeContext.tsx  # Light/Dark/System themes
-│   │   └── MapContext.tsx    # Map state management
+│   │   ├── MapContext.tsx    # Map state management
+│   │   ├── BLEScannerContext.tsx
+│   │   ├── MovementsContext.tsx
+│   │   └── UIFiltersContext.tsx
 │   ├── types/
 │   │   └── index.ts          # TypeScript types
-│   ├── App.tsx               # Main routing
+│   ├── app.tsx               # Main routing
 │   ├── main.tsx              # Entry point
 │   ├── index.html            # HTML template
 │   └── global.css            # Global styles + CSS vars
 ├── android/                   # Android native project
 ├── ios/                       # iOS native project
-├── public/                    # Static assets
 ├── docs/                      # Documentation
 │   ├── 00-README-SUMMARY.md
 │   ├── 01-PROTOTYPE-1-RFID.md
@@ -83,7 +76,7 @@ prototype-validation-docs/
 ├── tailwind.config.js
 ├── postcss.config.js
 ├── tsconfig.json
-└── [Documentation files]
+└── .env.local                 # Supabase credentials
 ```
 
 ---
@@ -151,7 +144,8 @@ npm run build && npx cap sync android
 | `/` | `SplashScreen` | Auto-navigate to home after 2.5s (first launch only) |
 | `/home` | `HomeDashboard` | Main dashboard with stats + recent movements |
 | `/inventory` | `InventoryList` | Tool catalog with RFID/BLE filters |
-| `/tool/:id` | `ToolDetail` | Tool details with draggable bottom sheet |
+| `/inventory/:id` | `ToolDetail` | Tool details with draggable bottom sheet |
+| `/tool/:id` | `ToolDetail` | Tool details (alternative route) |
 | `/radar` | `BLERadar` | BLE scanner with OpenStreetMap + geolocation |
 
 ### Placeholder Screens (TODO)
@@ -168,7 +162,7 @@ npm run build && npx cap sync android
   ↓
 /home (Dashboard)
   ├─→ /inventory (Tool list)
-  │     └─→ /tool/:id (Detail)
+  │     └─→ /tool/:id or /inventory/:id (Detail)
   ├─→ /radar (BLE scanner with map)
   ├─→ /alerts (TODO)
   └─→ /profile (TODO)
@@ -217,66 +211,6 @@ All colors are defined as CSS variables in `global.css` and mapped in `tailwind.
 
 ---
 
-## 🧩 Reusable Components
-
-### BottomNav
-5-tab bottom navigation with active state, haptic feedback, and React Router integration.
-
-### TopBar
-Configurable header with:
-- Back button option
-- Settings button
-- Theme toggle button
-- Notifications badge
-- Title
-
-### SearchBar
-Search input with optional filter button.
-
-### FilterChips
-Horizontal scrollable filter chips (Tous, RFID, BLE, RFID+BLE).
-
-### ToolCard
-Tool display card with:
-- Image thumbnail
-- Name + serial number + price
-- Status badge (Available, In Use, Maintenance, Lost)
-- RFID/BLE technology badges
-
-### StatCard
-Statistics card with:
-- Label + value
-- Trend indicator (+/-)
-- Colored left border
-
-### SwipeGesture ✨
-Gesture handler for swipe-left-to-go-back functionality:
-- Uses `@use-gesture/react` for touch gestures
-- Haptic feedback on native platforms
-- Configurable threshold and velocity
-- Custom swipe handler or default back navigation
-- Integrated on ToolDetail and InventoryList screens
-
-### ThemeToggle ✨
-Theme switcher button with 3 modes:
-- 🌙 Dark (default)
-- ☀️ Light
-- 🔄 System (follows OS preference)
-- Haptic feedback
-- Persists to localStorage
-
-### LeafletMap ✨
-OpenStreetMap integration component:
-- Interactive map with Leaflet
-- User geolocation with precision circle
-- Tool markers by status
-- Route polylines
-- Layer toggles (Items, Routes, Heatmap, Zones)
-- Zoom controls
-- Light/Dark theme support for tiles
-
----
-
 ## 📐 TypeScript Types
 
 ```typescript
@@ -288,6 +222,7 @@ interface Tool {
   rfidEnabled: boolean;
   bleEnabled: boolean;
   status: 'available' | 'in_use' | 'maintenance' | 'lost';
+  state: 'authorized' | 'locked'; // RFID security state
   assignedTo?: string;
   location?: string;
   price: number;
@@ -300,6 +235,8 @@ interface Movement {
   toolName: string;
   toolIcon: string;
   type: 'RFID_OUT' | 'RFID_IN' | 'BLE_DETECTED' | 'BLE_LOST';
+  checkpointId?: string; // ID of the RFID portal
+  authorized: boolean;   // Whether the movement was authorized by the system
   user?: string;
   location?: string;
   timestamp: string;
@@ -311,19 +248,10 @@ interface BLEDevice {
   name: string;
   distance: number;
   rssi: number;
-  status: 'hot' | 'warm' | 'cold';
+  smoothedRssi: number; // Filtered signal for radar stability
+  status: 'hot' | 'warm' | 'cold' | 'lost';
   icon: string;
-}
-
-interface MapItem {
-  id: string;
-  name: string;
-  type: 'tool' | 'equipment' | 'zone' | 'checkpoint';
-  position: LatLngExpression;
-  status?: string;
-  rssi?: number;
-  distance?: number;
-  metadata?: Record<string, any>;
+  lastPing: number; // Timestamp of last detection
 }
 ```
 
@@ -338,9 +266,9 @@ interface MapItem {
 - ✅ Tool markers on map
 - ✅ Custom markers by status
 - ✅ Route polylines (patrol routes)
-- ✅ Layer toggles
+- ✅ Layer toggles (Items, Routes, Heatmap, Zones)
 - ✅ Zoom controls
-- ✅ Light/Dark theme support
+- ✅ Light/Dark theme support for tiles
 
 ### Configuration
 
@@ -349,16 +277,6 @@ interface MapItem {
 const LAB_CENTER: [number, number] = [48.8566, 2.3522]; // Paris (exemple)
 
 // À remplacer par les coordonnées GPS de votre laboratoire
-```
-
-### User Geolocation
-
-```typescript
-// Composant UserLocation dans LeafletMap.tsx
-- watchPosition avec enableHighAccuracy
-- Cercle de précision (20m radius)
-- Marqueur personnalisé (cercle bleu)
-- Bouton "Me localiser" fonctionnel
 ```
 
 ---
@@ -381,18 +299,6 @@ const LAB_CENTER: [number, number] = [48.8566, 2.3522]; // Paris (exemple)
 
 ```
 🌙 Dark → ☀️ Light → 🔄 System → 🌙 Dark (loop)
-```
-
-### Implementation
-
-```typescript
-// src/contexts/ThemeContext.tsx
-interface ThemeContextType {
-  theme: 'light' | 'dark' | 'system';
-  resolvedTheme: 'light' | 'dark';
-  setTheme: (theme) => void;
-  toggleTheme: () => void;
-}
 ```
 
 ---
@@ -432,6 +338,25 @@ plugins: {
   }
 }
 ```
+
+---
+
+## 📊 Backend Integration (Supabase)
+
+### Environment Variables
+
+```env
+VITE_SUPABASE_URL=https://lidutbiyifnhzuksocjm.supabase.co
+VITE_SUPABASE_ANON_KEY=<anon_key>
+```
+
+### Planned Features
+
+- Database schema for tools, movements, users
+- Realtime subscriptions for live updates
+- Edge Functions for RFID validation
+- Row Level Security (RLS) policies
+- Authentication with JWT
 
 ---
 
@@ -528,9 +453,11 @@ export default function Component({ prop }: ComponentProps) {
   "@capacitor/ios": "^6.1.2",
   "@capacitor/network": "^6.0.2",
   "@capacitor/splash-screen": "latest",
+  "@supabase/supabase-js": "^2.103.0",
   "@types/leaflet": "^1.9.21",
   "@types/react-leaflet": "^2.8.3",
   "@use-gesture/react": "^10.3.1",
+  "framer-motion": "^12.38.0",
   "leaflet": "^1.9.4",
   "react": "^18.3.1",
   "react-dom": "^18.3.1",
@@ -563,7 +490,7 @@ export default function Component({ prop }: ComponentProps) {
 
 ### Best Practices
 
-- **API Keys**: Never commit `.env` files, use Capacitor SecureStorage (planned)
+- **API Keys**: Stored in `.env.local`, never commit to git
 - **Authentication**: Implement JWT with refresh tokens (TODO)
 - **HTTPS**: Enforce SSL for all API calls
 - **Data Validation**: Validate all user inputs
@@ -595,7 +522,7 @@ export default {
   plugins: {
     '@tailwindcss/postcss': {},
     autoprefixer: {},
-  },
+  }
 }
 ```
 
@@ -620,17 +547,6 @@ export default {
 **Cause**: `MapViewUpdater` component rendered as child of `MapContainer` while using `useMap()` hook  
 **Fix**: Removed `MapViewUpdater` - `MapContainer` handles center/zoom via props directly
 
-```diff
-- <MapContainer center={center} zoom={zoom}>
--   <MapViewUpdater center={center} zoom={zoom} />  ❌
--   ...
-- </MapContainer>
-
-+ <MapContainer center={center} zoom={zoom}>
-+   ...
-+ </MapContainer>
-```
-
 ---
 
 ## 📚 Documentation Files
@@ -639,11 +555,11 @@ export default {
 |------|---------|
 | `README.md` | Original Capacitor boilerplate docs |
 | `00-README-SUMMARY.md` | Executive summary of prototype validation |
-| `01-PROTOTYPE-1-RFID.md` | RFID checkpoint implementation (963 lines) |
-| `02-PROTOTYPE-2-BLE.md` | BLE radar implementation (1336 lines) |
-| `03-ARCHITECTURE-HYBRIDE.md` | Combined architecture, DB schema, scenarios |
-| `04-MATERIEL-VALIDATION.md` | Hardware validation, suppliers, alternatives |
-| `05-BIBLIOGRAPHIE.md` | Academic and technical references |
+| `01-PROTOTYPE-1-RFID.md` | Documentation complète du Prototype 1 |
+| `02-PROTOTYPE-2-BLE.md` | Documentation complète du Prototype 2 |
+| `03-ARCHITECTURE-HYBRIDE.md` | Architecture combinée et recommandations |
+| `04-MATERIEL-VALIDATION.md` | Validation détaillée de la liste de matériel |
+| `05-BIBLIOGRAPHIE.md` | Références académiques et techniques |
 | `MIGRATION-README.md` | Complete HTML → React migration guide |
 | `THEME-SYSTEM.md` | Light/Dark theme implementation docs |
 | `OPENSTREETMAP-INTEGRATION.md` | Map integration documentation |
@@ -713,16 +629,82 @@ export default {
 
 ---
 
+## 🧠 Expertise Sharing (Mulch)
+
+This project uses **Mulch** for structured expertise management between Qwen Code and OpenCodex agents.
+
+### What is Mulch?
+
+Mulch is a passive expertise management system that allows agents to:
+- **Record** learnings in structured JSONL files (`.mulch/expertise/<domain>.jsonl`)
+- **Query** accumulated knowledge across sessions
+- **Share** expertise between agents via git-tracked files
+
+**Key principle:** Mulch does NOT contain an LLM. Agents use Mulch — Mulch does not use agents.
+
+### Agent Workflow
+
+#### At Session Start (MANDATORY)
+
+```bash
+bunx @os-eco/mulch-cli prime
+```
+
+This injects all project expertise into your context before you start working.
+
+#### Before Session End (MANDATORY)
+
+```bash
+# 1. Discover what changed
+bunx @os-eco/mulch-cli learn
+
+# 2. Record insights from this session
+bunx @os-eco/mulch-cli record <domain> --type <type> --description "..."
+
+# 3. Validate and commit
+bunx @os-eco/mulch-cli sync
+```
+
+### Available Domains
+
+| Domain | Purpose | Records |
+|--------|---------|---------|
+| `architecture` | App structure, state management, routing | 2 |
+| `rfid` | RFID 13.56 MHz checkpoint logic | 1 |
+| `ble` | BLE beacon localization | 1 |
+| `supabase` | Backend decisions, real-time, auth | 1 |
+| `ui-ux` | Material Design 3, theming, Tailwind | 2 |
+| `mobile-dev` | Capacitor commands, workflows | 4 |
+| `rfid-tool-tracking` | Tool categorization, hybrid logic | 4 |
+
+### Record Types
+
+| Type | Use Case | Example |
+|------|----------|---------|
+| `convention` | Rules, standards | "Use React Context for state management" |
+| `pattern` | Named patterns | "Observer pattern for BLE scanner" |
+| `failure` | What went wrong + resolution | "MapContainer error → Remove MapViewUpdater" |
+| `decision` | Architectural choices | "Supabase over PostgreSQL: real-time subscriptions" |
+| `reference` | Key resources | "Dev server: npm run start on port 5173" |
+| `guide` | Procedures | "BLE beacon calibration procedure" |
+
+### Full Documentation
+
+See `docs/MULCH-GUIDE.md` for complete usage guide, examples, and troubleshooting.
+
+---
+
 **Project Goal:** Deliver a production-ready hybrid mobile app that combines RFID checkpoint security with BLE real-time localization on OpenStreetMap for comprehensive tool tracking in laboratory environments.
 
 **Current Status:** ✅ Frontend complete with:
 - 5 screens implemented
-- 9 reusable components
+- Multiple reusable components
 - Light/Dark theme system
 - OpenStreetMap integration
 - User geolocation
 - Gesture navigation
 - Android build ready
 - MapContainer context error fixed
+- **🧠 Mulch expertise sharing enabled**
 
 **Next Phase:** Backend integration and hardware testing.

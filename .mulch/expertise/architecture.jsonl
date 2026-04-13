@@ -1,0 +1,2 @@
+{"type":"convention","content":"Use React Context for state management (ThemeContext, MapContext, BLEScannerContext, MovementsContext, UIFiltersContext) - no Zustand needed yet","classification":"foundational","recorded_at":"2026-04-13T16:51:53.463Z","id":"mx-092add"}
+{"type":"failure","description":"Leaflet MapContainer context error when using useMap() hook in child component MapViewUpdater","resolution":"Remove MapViewUpdater - MapContainer handles center/zoom via props directly","classification":"foundational","recorded_at":"2026-04-13T16:51:55.114Z","id":"mx-f1d7f3"}

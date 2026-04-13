@@ -1,0 +1,2 @@
+{"type":"convention","content":"Use Material Design 3 color system with CSS variables in global.css for light/dark theme support","classification":"foundational","recorded_at":"2026-04-13T16:52:30.039Z","id":"mx-23c72f"}
+{"type":"failure","description":"Tailwind CSS v4 PostCSS plugin moved to separate package causing build errors","resolution":"Use @tailwindcss/postcss instead of tailwindcss in postcss.config.js, and @import 'tailwindcss' in CSS","classification":"tactical","recorded_at":"2026-04-13T16:53:10.397Z","id":"mx-59c763"}

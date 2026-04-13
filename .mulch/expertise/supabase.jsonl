@@ -1,0 +1,1 @@
+{"type":"decision","title":"Supabase for backend","rationale":"Real-time subscriptions via PostgreSQL LISTEN/NOTIFY, edge functions for RFID validation, built-in auth with JWT, generous free tier","classification":"foundational","recorded_at":"2026-04-13T16:52:55.254Z","id":"mx-66e893"}

@@ -1,0 +1,4 @@
+{"type":"reference","name":"Dev Server","description":"npm run start - Vite dev server on port 5173 (host mode)","classification":"tactical","recorded_at":"2026-04-13T16:49:18.368Z","tags":["vite","dev"],"id":"mx-c177df"}
+{"type":"reference","name":"Production Build","description":"npm run build - Production build to dist/","classification":"tactical","recorded_at":"2026-04-13T16:49:18.653Z","tags":["build","production"],"id":"mx-1a6749"}
+{"type":"reference","name":"iOS Dev","description":"npm run dev:ios - Build, sync, run on iOS simulator","classification":"tactical","recorded_at":"2026-04-13T16:49:18.954Z","tags":["ios","mobile"],"id":"mx-2ccd86"}
+{"type":"reference","name":"Android Dev","description":"npm run dev:android - Build, sync, run on Android emulator","classification":"tactical","recorded_at":"2026-04-13T16:49:19.287Z","tags":["android","mobile"],"id":"mx-606da4"}
