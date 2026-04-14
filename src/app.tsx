@@ -8,7 +8,7 @@ import BLERadar from './screens/BLERadar';
 // Placeholder screens for routes not yet implemented
 function PlaceholderScreen({ name }: { name: string }) {
   return (
-    <div className="flex items-center justify-center min-h-screen bg-surface text-on-surface">
+    <div className="flex items-center justify-center min-h-screen bg-black text-white">
       <div className="text-center">
         <h1 className="text-2xl font-bold mb-2">{name}</h1>
         <p className="text-outline">Screen in development</p>

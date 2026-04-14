@@ -12,24 +12,30 @@ const bleDevices: BLEDevice[] = [
     name: 'Caisse à outils Pro-X',
     distance: 1.2,
     rssi: -52,
+    smoothedRssi: -55,
     status: 'hot',
     icon: 'handyman',
+    lastPing: Date.now(),
   },
   {
     id: '2',
     name: 'Perceuse Hilti TE 6',
     distance: 8.4,
     rssi: -78,
+    smoothedRssi: -76,
     status: 'warm',
     icon: 'precision_manufacturing',
+    lastPing: Date.now() - 5000,
   },
   {
     id: '3',
     name: 'Générateur G-300',
     distance: 22.0,
     rssi: -92,
+    smoothedRssi: -90,
     status: 'cold',
     icon: 'electric_bolt',
+    lastPing: Date.now() - 15000,
   },
 ];
 
@@ -87,13 +93,13 @@ function BLERadarContent() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'hot':
-        return 'text-tertiary bg-tertiary/20 border-tertiary/30';
+        return 'text-primary bg-primary/20 border-primary/30';
       case 'warm':
-        return 'text-secondary bg-secondary/20 border-secondary/30';
+        return 'text-tertiary bg-tertiary/20 border-tertiary/30';
       case 'cold':
         return 'text-error bg-error/20 border-error/30';
       default:
-        return 'text-outline bg-outline/20 border-outline/30';
+        return 'text-[#FAFAFA]/60 bg-[#FAFAFA]/10 border-[#FAFAFA]/20';
     }
   };
 
@@ -111,9 +117,9 @@ function BLERadarContent() {
   };
 
   return (
-    <div className="relative flex h-screen w-full flex-col overflow-hidden bg-black text-white">
+    <div className="relative flex h-screen w-full flex-col overflow-hidden bg-gradient-to-b from-[#0A0A0A] via-[#0F0F0F] to-[#050505] text-[#FAFAFA]">
       {/* MAP LAYER - Full Screen */}
-      <div className="absolute inset-0">
+      <div className="absolute inset-0 opacity-80">
         <LeafletMap
           className="h-full w-full"
           showControls={true}
@@ -123,30 +129,30 @@ function BLERadarContent() {
       {/* TOP BAR (HUD) - Overlay */}
       <div className="fixed top-0 left-0 right-0 z-20 p-4 flex flex-col gap-4 pointer-events-none">
         {/* Status/Nav Header */}
-        <div className="flex items-center justify-between glass-header p-2 px-4 rounded-xl pointer-events-auto">
+        <div className="flex items-center justify-between glass-panel p-2 px-4 rounded-xl pointer-events-auto">
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center size-10 rounded-lg bg-[#06C167] text-black">
+            <div className="flex items-center justify-center size-10 rounded-lg bg-primary text-black">
               <span className="material-symbols-outlined" style={{ fontVariationSettings: '"FILL" 1' }}>
                 bluetooth
               </span>
             </div>
             <div>
-              <h1 className="text-sm font-headline font-bold text-white tracking-tight leading-none">
+              <h1 className="text-sm font-headline font-bold text-[#FAFAFA] tracking-tight leading-none">
                 Radar BLE
               </h1>
-              <span className="text-[10px] font-label font-bold text-[#06C167] uppercase tracking-widest">
+              <span className="text-[10px] font-label font-bold text-primary uppercase tracking-widest">
                 {radarEnabled ? 'Actif' : 'Inactif'}
               </span>
             </div>
           </div>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-label font-bold text-white/70 uppercase">
+              <span className="text-[10px] font-label font-bold text-[#FAFAFA]/70 uppercase">
                 Radar
               </span>
               <div
                 className={`w-10 h-5 rounded-full relative ${
-                  radarEnabled ? 'bg-[#06C167]' : 'bg-white/20'
+                  radarEnabled ? 'bg-primary' : 'bg-white/20'
                 }`}
               >
                 <div
@@ -162,32 +168,32 @@ function BLERadarContent() {
         {/* Search & Filters */}
         <div className="flex gap-2 pointer-events-auto">
           <SearchBar placeholder="Rechercher un outil..." />
-          <button className="bg-white/10 backdrop-blur-md px-4 rounded-xl flex items-center gap-2">
-            <span className="text-sm font-medium text-white">Tous</span>
-            <span className="material-symbols-outlined text-[#06C167] text-sm">filter_list</span>
+          <button className="glass-panel px-4 rounded-xl flex items-center gap-2">
+            <span className="text-sm font-medium text-[#FAFAFA]">Tous</span>
+            <span className="material-symbols-outlined text-primary text-sm">filter_list</span>
           </button>
         </div>
       </div>
 
       {/* BOTTOM SHEET - Overlay */}
-      <div className="absolute bottom-0 left-0 right-0 z-30 bg-black/90 backdrop-blur-3xl rounded-t-[2rem] border-t border-white/10 pb-8 shadow-uber-xl">
+      <div className="absolute bottom-0 left-0 right-0 z-30 glass-panel-tall rounded-t-[2rem] pb-8 shadow-glass">
         {/* Drag Handle */}
         <div className="flex justify-center pt-3 pb-4">
-          <div className="w-10 h-1 rounded-full bg-white/20" />
+          <div className="w-10 h-1 rounded-full bg-[#FAFAFA]/20" />
         </div>
 
         <div className="px-6 space-y-6">
           {/* Header Stats */}
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-headline font-bold text-white">
+              <h2 className="text-lg font-headline font-bold text-[#FAFAFA]">
                 Recherche d'outils...
               </h2>
-              <p className="text-xs text-white/70 font-body">
+              <p className="text-xs text-[#FAFAFA]/70 font-body">
                 {items.length} outil(s) détecté(s)
               </p>
             </div>
-            <div className="bg-[#06C167] px-3 py-1.5 rounded-lg">
+            <div className="bg-primary px-3 py-1.5 rounded-lg">
               <span className="text-xs font-label font-bold text-black uppercase">
                 {items.length} Détectés
               </span>
@@ -199,12 +205,12 @@ function BLERadarContent() {
             {bleDevices.map((device) => (
               <div
                 key={device.id}
-                className="min-w-[200px] bg-white/5 p-4 rounded-2xl flex flex-col gap-3 border border-white/5"
+                className="min-w-[200px] glass-card p-4 rounded-2xl flex flex-col gap-3"
               >
                 <div className="flex items-start justify-between">
-                  <div className="size-10 rounded-xl bg-[#06C167]/10 flex items-center justify-center">
+                  <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center">
                     <span
-                      className="material-symbols-outlined text-[#06C167]"
+                      className="material-symbols-outlined text-primary"
                       style={{ fontVariationSettings: '"FILL" 1' }}
                     >
                       {device.icon}
@@ -215,11 +221,11 @@ function BLERadarContent() {
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-white leading-tight">{device.name}</h3>
+                  <h3 className="text-sm font-bold text-[#FAFAFA] leading-tight">{device.name}</h3>
                   <div className="flex items-center gap-2 mt-1">
-                    <span className="text-xs text-[#06C167] font-bold">{device.distance}m</span>
-                    <span className="text-[10px] text-white/50">•</span>
-                    <span className="text-[10px] text-white/50 font-medium">
+                    <span className="text-xs text-primary font-bold">{device.distance}m</span>
+                    <span className="text-[10px] text-[#FAFAFA]/50">•</span>
+                    <span className="text-[10px] text-[#FAFAFA]/50 font-medium">
                       {device.rssi} dBm
                     </span>
                   </div>

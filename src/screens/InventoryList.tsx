@@ -20,6 +20,7 @@ const sampleTools: Tool[] = [
     bleEnabled: false,
     status: 'available',
     price: 249.00,
+    state: 'authorized',
   },
   {
     id: '2',
@@ -30,6 +31,7 @@ const sampleTools: Tool[] = [
     bleEnabled: true,
     status: 'in_use',
     price: 185.50,
+    state: 'authorized',
   },
   {
     id: '3',
@@ -40,6 +42,7 @@ const sampleTools: Tool[] = [
     bleEnabled: true,
     status: 'maintenance',
     price: 420.00,
+    state: 'locked',
   },
 ];
 
@@ -62,20 +65,22 @@ export default function InventoryList() {
 
   return (
     <SwipeGesture onSwipeLeft={handleSwipeBack}>
-      <div className="bg-[#000000] text-white min-h-screen pb-32">
-      <TopBar
-        title="Inventaire"
-        showSettings
-        showThemeToggle
-      />
+      <div className="min-h-screen pb-32" style={{ background: 'linear-gradient(180deg, #121212 0%, #0a0a0a 100%)' }}>
+      <div className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl" style={{ background: 'rgba(18, 18, 18, 0.85)', borderBottom: '1px solid rgba(255, 255, 255, 0.06)' }}>
+        <TopBar
+          title="Inventaire"
+          showSettings
+          showThemeToggle
+        />
+      </div>
 
-      <main className="pt-24 pb-32 px-6 max-w-2xl mx-auto">
+      <main className="pt-32 pb-32 px-6 max-w-2xl mx-auto">
         {/* Header */}
         <section className="mb-8">
-          <h2 className="font-headline text-4xl font-extrabold tracking-tight text-white">
+          <h2 className="font-headline text-4xl font-extrabold tracking-tight" style={{ color: '#FAFAFA' }}>
             Inventaire
           </h2>
-          <p className="font-label text-xs font-bold uppercase tracking-widest text-[#06C167] mt-2">
+          <p className="font-label text-xs font-bold uppercase tracking-widest" style={{ color: '#06C167' }} mt-2>
             127 OUTILS · 3 CATÉGORIES
           </p>
         </section>
@@ -94,11 +99,11 @@ export default function InventoryList() {
         {/* Grouped List */}
         <section className="space-y-8">
           <div className="space-y-4">
-            <div className="flex items-center justify-between border-b border-white/10 pb-2">
-              <h3 className="font-headline text-lg font-bold text-white">
+            <div className="flex items-center justify-between pb-2" style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.06)' }}>
+              <h3 className="font-headline text-lg font-bold" style={{ color: '#FAFAFA' }}>
                 Électroportatif
               </h3>
-              <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">
+              <span className="text-[10px] font-bold" style={{ color: 'rgba(255, 255, 255, 0.4)' }}>
                 42 Outils
               </span>
             </div>
@@ -109,11 +114,11 @@ export default function InventoryList() {
           </div>
 
           <div className="space-y-4">
-            <div className="flex items-center justify-between border-b border-white/10 pb-2">
-              <h3 className="font-headline text-lg font-bold text-white">
+            <div className="flex items-center justify-between pb-2" style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.06)' }}>
+              <h3 className="font-headline text-lg font-bold" style={{ color: '#FAFAFA' }}>
                 Mesure & Traçage
               </h3>
-              <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">
+              <span className="text-[10px] font-bold" style={{ color: 'rgba(255, 255, 255, 0.4)' }}>
                 15 Outils
               </span>
             </div>
@@ -125,8 +130,15 @@ export default function InventoryList() {
         </section>
       </main>
 
-      {/* FAB - Uber style */}
-      <button className="fixed right-6 bottom-28 w-14 h-14 bg-[#06C167] rounded-full shadow-uber-lg flex items-center justify-center text-white active:scale-90 transition-transform z-40">
+      {/* FAB - Glassmorphism */}
+      <button 
+        className="fixed right-6 bottom-28 w-14 h-14 flex items-center justify-center text-white active:scale-90 transition-transform z-40"
+        style={{ 
+          background: 'linear-gradient(135deg, #06C167 0%, #05A156 100%)', 
+          borderRadius: '999px',
+          boxShadow: '0 8px 32px rgba(6, 193, 103, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+        }}
+      >
         <span className="material-symbols-outlined text-3xl">add</span>
       </button>
 

@@ -42,14 +42,14 @@ export default function ToolStateManager({ tools, onToggleState }: ToolStateMana
             <input
               type="text"
               placeholder="Search tools..."
-              className="w-full pl-9 pr-4 py-2 rounded-xl bg-surface-container-high text-xs border border-outline/10 focus:border-primary outline-none transition-all"
+              className="w-full pl-9 pr-4 py-2 rounded-xl bg-black-container-high text-xs border border-white/10 focus:border-[#06C167] outline-none transition-all"
               value={toolSearch}
               onChange={(e) => setToolSearch(e.target.value)}
             />
           </div>
 
           <select
-            className="bg-surface-container-high text-xs border border-outline/10 rounded-xl px-3 py-2 outline-none focus:border-primary transition-all"
+            className="bg-black-container-high text-xs border border-white/10 rounded-xl px-3 py-2 outline-none focus:border-[#06C167] transition-all"
             value={toolCategoryFilter}
             onChange={(e) => setToolCategoryFilter(e.target.value)}
           >
@@ -76,13 +76,13 @@ export default function ToolStateManager({ tools, onToggleState }: ToolStateMana
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
               key={tool.id}
-              className="p-3 rounded-2xl bg-surface-container-highest border border-outline/10 flex items-center justify-between group hover:border-primary/30 transition-all"
+              className="p-3 rounded-2xl bg-black-container-highest border border-white/10 flex items-center justify-between group hover:border-[#06C167]/30 transition-all"
             >
               <div className="flex items-center gap-3">
                 <div className={`size-2 rounded-full ${tool.state === 'authorized' ? 'bg-emerald-500 shadow-[0_0_8px_#10b981]' : 'bg-red-500 shadow-[0_0_8px_#ef4444]'}`} />
                 <div>
                   <p className="text-xs font-bold text-white leading-none">{tool.name}</p>
-                  <p className="text-[10px] text-on-surface-variant font-mono mt-1">{tool.serialNumber}</p>
+                  <p className="text-[10px] text-white-variant font-mono mt-1">{tool.serialNumber}</p>
                 </div>
               </div>
 
@@ -104,7 +104,7 @@ export default function ToolStateManager({ tools, onToggleState }: ToolStateMana
       {filteredTools.length === 0 && (
         <div className="py-12 text-center">
           <span className="material-symbols-outlined text-outline text-4xl block mb-2">search_off</span>
-          <p className="text-xs text-on-surface-variant">No tools found matching your criteria</p>
+          <p className="text-xs text-white-variant">No tools found matching your criteria</p>
         </div>
       )}
     </div>

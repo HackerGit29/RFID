@@ -18,13 +18,13 @@ export default function ActivityFeed({ movements }: ActivityFeedProps) {
           }}
         >
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-surface-container-highest rounded-lg flex items-center justify-center">
-              <span className="material-symbols-outlined text-primary">
+            <div className="w-12 h-12 bg-black-container-highest rounded-lg flex items-center justify-center">
+              <span className="material-symbols-outlined text-[#06C167]">
                 {movement.toolIcon}
               </span>
             </div>
             <div>
-              <h3 className="font-bold text-sm text-on-surface">{movement.toolName}</h3>
+              <h3 className="font-bold text-sm text-white">{movement.toolName}</h3>
               <div className="flex items-center gap-2 mt-0.5">
                 <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-tighter ${
                   movement.authorized ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'
@@ -38,7 +38,7 @@ export default function ActivityFeed({ movements }: ActivityFeedProps) {
             </div>
           </div>
           <div className="text-right">
-            <span className="block font-bold text-xs text-on-surface">{movement.timestamp}</span>
+            <span className="block font-bold text-xs text-white">{movement.timestamp}</span>
             <span className={`block text-[10px] font-bold uppercase ${
               movement.authorized ? 'text-emerald-400' : 'text-red-400'
             }`}>

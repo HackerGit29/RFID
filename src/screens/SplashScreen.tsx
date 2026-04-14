@@ -53,9 +53,9 @@ export default function SplashScreen() {
   }, [navigate]);
 
   return (
-    <main className="relative flex flex-col items-center justify-between w-full h-screen min-h-screen bg-surface mesh-gradient overflow-hidden">
+    <main className="relative flex flex-col items-center justify-between w-full h-screen min-h-screen bg-black mesh-gradient overflow-hidden">
       {/* Top Visual Elements */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary-container/20 rounded-full blur-[120px]"></div>
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#06C167]/20 rounded-full blur-[120px]"></div>
       <div className="absolute bottom-[-5%] right-[-5%] w-[30%] h-[30%] bg-on-primary-container/10 rounded-full blur-[100px]"></div>
       
       {/* Spacer for centering layout */}
@@ -94,7 +94,7 @@ export default function SplashScreen() {
       <div className="flex-1 flex flex-col justify-end items-center pb-12 w-full px-8">
         <div className="flex flex-col items-center space-y-4">
           {/* Loading Indicator (Industrial style) */}
-          <div className="w-12 h-[2px] bg-surface-container-highest rounded-full overflow-hidden">
+          <div className="w-12 h-[2px] bg-black-container-highest rounded-full overflow-hidden">
             <div className="w-1/2 h-full bg-primary rounded-full animate-pulse"></div>
           </div>
           
@@ -104,10 +104,10 @@ export default function SplashScreen() {
               Powered by
             </span>
             <div className="flex items-center gap-1">
-              <span className="material-symbols-outlined text-primary text-sm" style={{ fontVariationSettings: '"FILL" 1' }}>
+              <span className="material-symbols-outlined text-[#06C167] text-sm" style={{ fontVariationSettings: '"FILL" 1' }}>
                 bolt
               </span>
-              <span className="font-headline text-xs font-bold text-on-surface tracking-tight">
+              <span className="font-headline text-xs font-bold text-white tracking-tight">
                 Supabase
               </span>
             </div>
