@@ -3,63 +3,136 @@
 /* Leaflet CSS */
 @import 'leaflet/dist/leaflet.css';
 
-/* Custom CSS Variables for Material Design 3 Colors */
+/* ========================================
+   UBER DESIGN SYSTEM - Dark Theme Primary
+   ======================================== */
+
 :root {
-  /* Surface colors */
-  --surface: #0b1326;
-  --surface-container: #171f33;
-  --surface-container-high: #222a3d;
-  --surface-container-highest: #2d3449;
-  --surface-container-low: #131b2e;
-  --surface-container-lowest: #060e20;
-  --surface-bright: #31394d;
-  --surface-dim: #0b1326;
-  --surface-variant: #2d3449;
-  
-  /* Primary colors */
-  --primary: #adc6ff;
-  --primary-container: #00163a;
-  --primary-fixed: #d8e2ff;
-  --primary-fixed-dim: #adc6ff;
-  --on-primary: #002e6a;
-  --on-primary-container: #357df1;
-  --on-primary-fixed: #001a42;
-  --on-primary-fixed-variant: #004395;
-  
-  /* Secondary colors */
-  --secondary: #bec6e0;
-  --secondary-container: #3f465c;
-  --secondary-fixed: #dae2fd;
-  --secondary-fixed-dim: #bec6e0;
-  --on-secondary: #283044;
-  --on-secondary-container: #adb4ce;
-  --on-secondary-fixed: #131b2e;
-  --on-secondary-fixed-variant: #3f465c;
-  
-  /* Tertiary colors */
-  --tertiary: #4edea3;
-  --tertiary-container: #001c10;
-  --tertiary-fixed: #6ffbbe;
-  --tertiary-fixed-dim: #4edea3;
-  --on-tertiary: #003824;
-  --on-tertiary-container: #009365;
-  --on-tertiary-fixed: #002113;
-  --on-tertiary-fixed-variant: #005236;
-  
-  /* Other colors */
-  --error: #ffb4ab;
-  --error-container: #93000a;
-  --on-error: #690005;
-  --on-error-container: #ffdad6;
-  --outline: #909097;
-  --outline-variant: #45464d;
-  --background: #0b1326;
-  --on-background: #dae2fd;
-  --on-surface: #dae2fd;
-  --on-surface-variant: #c6c6cd;
-  --inverse-surface: #dae2fd;
-  --inverse-on-surface: #283044;
-  --inverse-primary: #005ac2;
+  /* Core Uber Colors */
+  --uber-black: #000000;
+  --uber-white: #FFFFFF;
+  --uber-green: #06C167;
+  --uber-green-light: #33D68A;
+  --uber-green-dark: #05A858;
+  --uber-red: #FF3B30;
+  --uber-blue: #0071EB;
+  --uber-orange: #FF6B00;
+  --uber-yellow: #FFC107;
+
+  /* Surface Colors - Uber Style */
+  --surface: #000000;
+  --surface-container: #121212;
+  --surface-container-high: #1E1E1E;
+  --surface-container-highest: #2A2A2A;
+  --surface-container-low: #0A0A0A;
+  --surface-container-lowest: #050505;
+  --surface-bright: #333333;
+  --surface-dim: #000000;
+  --surface-variant: #1A1A1A;
+
+  /* Primary - Uber Green */
+  --primary: #06C167;
+  --primary-container: #06C167;
+  --primary-fixed: #06C167;
+  --primary-fixed-dim: #06C167;
+  --on-primary: #000000;
+  --on-primary-container: #000000;
+  --on-primary-fixed: #000000;
+  --on-primary-fixed-variant: #000000;
+
+  /* Secondary */
+  --secondary: #06C167;
+  --secondary-container: #06C167;
+  --secondary-fixed: #06C167;
+  --secondary-fixed-dim: #06C167;
+  --on-secondary: #000000;
+  --on-secondary-container: #000000;
+  --on-secondary-fixed: #000000;
+  --on-secondary-fixed-variant: #000000;
+
+  /* Tertiary */
+  --tertiary: #06C167;
+  --tertiary-container: #06C167;
+  --tertiary-fixed: #06C167;
+  --tertiary-fixed-dim: #06C167;
+  --on-tertiary: #000000;
+  --on-tertiary-container: #000000;
+  --on-tertiary-fixed: #000000;
+  --on-tertiary-fixed-variant: #000000;
+
+  /* Error */
+  --error: #FF3B30;
+  --error-container: #FF3B30;
+  --on-error: #FFFFFF;
+  --on-error-container: #FFFFFF;
+
+  /* On Surface */
+  --on-surface: #FFFFFF;
+  --on-surface-variant: #A0A0A0;
+
+  /* Outline & Borders */
+  --outline: #333333;
+  --outline-variant: #2A2A2A;
+
+  /* Background */
+  --background: #000000;
+  --on-background: #FFFFFF;
+
+  /* Inverse (for light elements on dark) */
+  --inverse-surface: #FFFFFF;
+  --inverse-on-surface: #000000;
+  --inverse-primary: #000000;
+}
+
+/* ========================================
+   Light Theme Support (Optional)
+   ======================================== */
+
+:root.light {
+  --surface: #FFFFFF;
+  --surface-container: #F5F5F5;
+  --surface-container-high: #EEEEEE;
+  --surface-container-highest: #E0E0E0;
+  --surface-container-low: #FAFAFA;
+  --surface-container-lowest: #FFFFFF;
+  --surface-bright: #FFFFFF;
+  --surface-dim: #F5F5F5;
+  --surface-variant: #F0F0F0;
+
+  --primary: #06C167;
+  --primary-container: #E6F7EF;
+  --primary-fixed: #06C167;
+  --primary-fixed-dim: #05A858;
+  --on-primary: #FFFFFF;
+  --on-primary-container: #003D21;
+
+  --secondary: #06C167;
+  --secondary-container: #E6F7EF;
+  --on-secondary: #FFFFFF;
+  --on-secondary-container: #003D21;
+
+  --tertiary: #06C167;
+  --tertiary-container: #E6F7EF;
+  --on-tertiary: #FFFFFF;
+  --on-tertiary-container: #003D21;
+
+  --error: #FF3B30;
+  --error-container: #FF3B30;
+  --on-error: #FFFFFF;
+  --on-error-container: #FFFFFF;
+
+  --on-surface: #000000;
+  --on-surface-variant: #666666;
+
+  --outline: #E0E0E0;
+  --outline-variant: #EEEEEE;
+
+  --background: #FFFFFF;
+  --on-background: #000000;
+
+  --inverse-surface: #000000;
+  --inverse-on-surface: #FFFFFF;
+  --inverse-primary: #FFFFFF;
 }
 
 /* Base styles */
@@ -93,53 +166,53 @@ html, body, #root {
 /* Custom utility classes */
 .mesh-gradient {
   background-image:
-    radial-gradient(at 0% 0%, rgba(53, 125, 241, 0.15) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, rgba(173, 198, 255, 0.1) 0px, transparent 50%);
+    radial-gradient(at 0% 0%, rgba(6, 193, 103, 0.15) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(6, 193, 103, 0.1) 0px, transparent 50%);
 }
 
 .logo-glow {
   filter: blur(40px);
-  background: radial-gradient(circle, rgba(173, 198, 255, 0.3) 0%, rgba(53, 125, 241, 0) 70%);
+  background: radial-gradient(circle, rgba(6, 193, 103, 0.3) 0%, rgba(6, 193, 103, 0) 70%);
 }
 
-/* Glassmorphism effects - Theme aware */
+/* Uber-style glass effects */
 .glass-panel {
-  background: rgba(34, 42, 61, 0.6);
+  background: rgba(18, 18, 18, 0.85);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 /* Light mode adjustment */
-:root:not(.dark) .glass-panel {
+:root.light .glass-panel {
   background: rgba(255, 255, 255, 0.85);
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 .glass-header {
-  background: rgba(11, 19, 38, 0.6);
+  background: rgba(0, 0, 0, 0.95);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* Light mode adjustment */
-:root:not(.dark) .glass-header {
-  background: rgba(248, 249, 255, 0.85);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+:root.light .glass-header {
+  background: rgba(255, 255, 255, 0.95);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 .bottom-sheet {
-  background: rgba(11, 19, 38, 0.9);
+  background: rgba(0, 0, 0, 0.95);
   backdrop-filter: blur(32px);
   -webkit-backdrop-filter: blur(32px);
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* Light mode adjustment */
-:root:not(.dark) .bottom-sheet {
-  background: rgba(248, 249, 255, 0.95);
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
+:root.light .bottom-sheet {
+  background: rgba(255, 255, 255, 0.95);
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 .map-bg {

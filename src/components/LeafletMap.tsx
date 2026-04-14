@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Polyline, LayerGroup, useMap, CircleMarker } from 'react-leaflet';
 import { Icon, LatLngExpression } from 'leaflet';
 import { useMapContext, MapItem } from '../contexts/MapContext';
@@ -34,35 +34,30 @@ const createUserIcon = (): Icon => {
 
 const getStatusColor = (status?: string): string => {
   switch (status) {
-    case 'available': return 'text-tertiary';
-    case 'in_use': return 'text-primary';
-    case 'maintenance': return 'text-secondary';
-    case 'lost': return 'text-error';
-    default: return 'text-outline';
+    case 'available': return '#06C167';
+    case 'in_use': return '#ffffff';
+    case 'maintenance': return '#06C167';
+    case 'lost': return '#ef4444';
+    default: return '#06C167';
   }
 };
 
 // User location component
-function UserLocation({ onLocationFound }: { onLocationFound: (pos: LatLngExpression) => void }) {
-  const [userPosition, setUserPosition] = useState<LatLngExpression | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  
+function UserLocation() {
+  const { userPosition, setUserPosition } = useMapContext();
+
   useEffect(() => {
     if (!navigator.geolocation) {
-      setError('Géolocalisation non supportée');
       return;
     }
-    
+
     const watchId = navigator.geolocation.watchPosition(
       (position) => {
         const pos: LatLngExpression = [position.coords.latitude, position.coords.longitude];
         setUserPosition(pos);
-        onLocationFound(pos);
-        setError(null);
       },
-      (err) => {
-        console.error('Erreur géolocalisation:', err);
-        setError('Position non disponible');
+      () => {
+        // Error handling is managed by MapContext
       },
       {
         enableHighAccuracy: true,
@@ -70,19 +65,18 @@ function UserLocation({ onLocationFound }: { onLocationFound: (pos: LatLngExpres
         maximumAge: 5000,
       }
     );
-    
+
     return () => navigator.geolocation.clearWatch(watchId);
-  }, [onLocationFound]);
-  
+  }, [setUserPosition]);
+
   if (!userPosition) return null;
-  
+
   return (
     <>
       <Marker position={userPosition} icon={createUserIcon()} zIndexOffset={1000}>
         <Popup>
-          <div className="p-2">
-            <h3 className="font-bold">Votre position</h3>
-            {error && <p className="text-error text-sm mt-1">{error}</p>}
+          <div className="p-3 min-w-[180px]" style={{ background: '#121212', borderRadius: '12px' }}>
+            <h3 className="font-bold" style={{ color: '#ffffff', fontFamily: 'UberMove, sans-serif' }}>Votre position</h3>
           </div>
         </Popup>
       </Marker>
@@ -90,7 +84,7 @@ function UserLocation({ onLocationFound }: { onLocationFound: (pos: LatLngExpres
       <CircleMarker
         center={userPosition}
         radius={20}
-        pathOptions={{ color: '#357df1', fillColor: '#357df1', fillOpacity: 0.1, weight: 1 }}
+        pathOptions={{ color: '#06C167', fillColor: '#06C167', fillOpacity: 0.1, weight: 1 }}
       />
     </>
   );
@@ -112,28 +106,28 @@ function ItemMarker({ item, isSelected }: { item: MapItem; isSelected: boolean }
       }}
     >
       <Popup>
-        <div className="p-2 min-w-[200px]">
-          <h3 className="font-bold text-lg text-on-surface">{item.name}</h3>
-          <p className="text-sm text-on-surface-variant capitalize mt-1">Type: {item.type}</p>
+        <div className="p-3 min-w-[200px]" style={{ background: '#121212', borderRadius: '12px' }}>
+          <h3 className="font-bold text-lg" style={{ color: '#ffffff', fontFamily: 'UberMove, sans-serif' }}>{item.name}</h3>
+          <p className="text-sm capitalize mt-1" style={{ color: '#ffffff99' }}>Type: {item.type}</p>
           {item.status && (
             <div className="flex items-center gap-2 mt-2">
               <span className={`w-2 h-2 rounded-full ${
-                item.status === 'available' ? 'bg-tertiary' :
-                item.status === 'in_use' ? 'bg-primary' :
-                item.status === 'maintenance' ? 'bg-secondary' : 'bg-error'
+                item.status === 'available' ? 'bg-[#06C167]' :
+                item.status === 'in_use' ? 'bg-[#ffffff]' :
+                item.status === 'maintenance' ? 'bg-[#06C167]' : 'bg-[#ef4444]'
               }`} />
-              <span className={`text-sm font-bold capitalize ${getStatusColor(item.status)}`}>
+              <span className={`text-sm font-bold capitalize`} style={{ color: getStatusColor(item.status) }}>
                 {item.status.replace('_', ' ')}
               </span>
             </div>
           )}
           {item.distance && (
-            <p className="text-sm text-on-surface mt-2">
-              Distance: <span className="font-bold text-primary">{item.distance.toFixed(1)}m</span>
+            <p className="text-sm mt-2" style={{ color: '#ffffff' }}>
+              Distance: <span className="font-bold" style={{ color: '#06C167' }}>{item.distance.toFixed(1)}m</span>
             </p>
           )}
           {item.rssi && (
-            <p className="text-sm text-on-surface-variant">
+            <p className="text-sm" style={{ color: '#ffffff99' }}>
               RSSI: <span className="font-mono">{item.rssi} dBm</span>
             </p>
           )}
@@ -148,7 +142,7 @@ function RouteLine({ route }: { route: { id: string; name: string; path: LatLngE
   return (
     <Polyline
       positions={route.path}
-      color={route.color || '#357df1'}
+      color={route.color || '#06C167'}
       weight={route.width || 3}
       dashArray={route.dashed ? '5, 10' : undefined}
       opacity={0.7}
@@ -162,27 +156,22 @@ interface LeafletMapProps {
   showUserLocation?: boolean;
 }
 
-export default function LeafletMap({ 
-  className = 'h-full w-full', 
+export default function LeafletMap({
+  className = 'h-full w-full',
   showControls = true,
-  showUserLocation = true 
+  showUserLocation = true
 }: LeafletMapProps) {
   const { resolvedTheme } = useTheme();
-  const { 
-    center, 
-    zoom, 
-    items, 
-    routes, 
-    layers, 
+  const {
+    center,
+    zoom,
+    items,
+    routes,
+    layers,
     selectedItemId,
     toggleLayer,
     setView
   } = useMapContext();
-  
-  const handleLocationFound = useCallback((pos: LatLngExpression) => {
-    // Optionnel: centrer la carte sur la position utilisateur
-    // setView(pos, 19);
-  }, [setView]);
   
   return (
     <div className={`relative ${className}`}>
@@ -191,11 +180,11 @@ export default function LeafletMap({
         zoom={zoom}
         zoomControl={false}
         className="h-full w-full rounded-lg"
-        style={{ background: resolvedTheme === 'dark' ? '#0b1326' : '#f8f9ff' }}
+        style={{ background: resolvedTheme === 'dark' ? '#000000' : '#f8f9ff' }}
       >
         {/* User Location */}
         {showUserLocation && (
-          <UserLocation onLocationFound={handleLocationFound} />
+          <UserLocation />
         )}
         
         {/* Tile Layer (OpenStreetMap) */}
@@ -229,24 +218,26 @@ export default function LeafletMap({
           </LayerGroup>
         )}
         
-        {/* Zoom Controls */}
+        {/* Zoom Controls - Uber Style */}
         {showControls && (
           <div className="absolute bottom-4 right-4 z-[1000] flex flex-col gap-2">
             <button
               onClick={() => {}}
-              className="bg-surface-container-highest text-on-surface p-2 rounded-lg shadow-lg hover:bg-surface-bright transition-colors active:scale-95"
+              className="p-3 rounded-full shadow-lg hover:scale-105 active:scale-95 transition-all"
+              style={{ background: '#121212', boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}
               title="Zoom +"
               aria-label="Zoom avant"
             >
-              <span className="material-symbols-outlined">add</span>
+              <span className="material-symbols-outlined" style={{ color: '#ffffff' }}>add</span>
             </button>
             <button
               onClick={() => {}}
-              className="bg-surface-container-highest text-on-surface p-2 rounded-lg shadow-lg hover:bg-surface-bright transition-colors active:scale-95"
+              className="p-3 rounded-full shadow-lg hover:scale-105 active:scale-95 transition-all"
+              style={{ background: '#121212', boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}
               title="Zoom -"
               aria-label="Zoom arrière"
             >
-              <span className="material-symbols-outlined">remove</span>
+              <span className="material-symbols-outlined" style={{ color: '#ffffff' }}>remove</span>
             </button>
             {showUserLocation && (
               <button
@@ -257,29 +248,35 @@ export default function LeafletMap({
                     });
                   }
                 }}
-                className="bg-surface-container-highest text-on-surface p-2 rounded-lg shadow-lg hover:bg-surface-bright transition-colors active:scale-95"
+                className="p-3 rounded-full shadow-lg hover:scale-105 active:scale-95 transition-all"
+                style={{ background: '#06C167', boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}
                 title="Me localiser"
                 aria-label="Ma position"
               >
-                <span className="material-symbols-outlined">my_location</span>
+                <span className="material-symbols-outlined" style={{ color: '#000000' }}>my_location</span>
               </button>
             )}
           </div>
         )}
         
-        {/* Layer Toggle Controls */}
+        {/* Layer Toggle Controls - Uber Style */}
         {showControls && (
-          <div className="absolute top-4 right-4 z-[1000] bg-surface-container-highest rounded-lg shadow-lg p-2">
+          <div className="absolute top-4 right-4 z-[1000] rounded-xl shadow-lg p-2" style={{ background: '#121212', boxShadow: '0 4px 16px rgba(0,0,0,0.2)' }}>
             <div className="flex flex-col gap-1">
               {layers.map(layer => (
                 <button
                   key={layer.id}
                   onClick={() => toggleLayer(layer.id)}
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded text-sm transition-colors ${
+                  className={`flex items-center gap-2 px-3 py-2 rounded-full text-sm transition-all ${
                     layer.visible
-                      ? 'bg-primary text-on-primary'
-                      : 'bg-surface-container text-on-surface-variant'
+                      ? ''
+                      : ''
                   }`}
+                  style={{
+                    background: layer.visible ? '#06C167' : '#ffffff20',
+                    color: layer.visible ? '#000000' : '#ffffff',
+                    fontFamily: 'UberMoveText, sans-serif'
+                  }}
                 >
                   <span className="material-symbols-outlined text-sm">
                     {layer.visible ? 'visibility' : 'visibility_off'}

@@ -34,29 +34,34 @@ interface MapContextType {
   center: LatLngExpression;
   zoom: number;
   bounds?: LatLngBoundsExpression;
-  
+
+  // User location
+  userPosition: LatLngExpression | null;
+  geolocationError: string | null;
+  setUserPosition: (pos: LatLngExpression | null) => void;
+
   // Items
   items: MapItem[];
   addItem: (item: MapItem) => void;
   updateItem: (id: string, updates: Partial<MapItem>) => void;
   removeItem: (id: string) => void;
   clearItems: () => void;
-  
+
   // Routes
   routes: MapRoute[];
   addRoute: (route: MapRoute) => void;
   removeRoute: (id: string) => void;
   clearRoutes: () => void;
-  
+
   // Layers
   layers: MapLayer[];
   toggleLayer: (layerId: string) => void;
-  
+
   // View controls
   setView: (center: LatLngExpression, zoom: number) => void;
   fitBounds: (bounds: LatLngBoundsExpression) => void;
   focusOnItem: (itemId: string) => void;
-  
+
   // Interaction
   selectedItemId?: string;
   selectItem: (id: string | undefined) => void;
@@ -72,7 +77,11 @@ export function MapProvider({ children }: { children: ReactNode }) {
   const [center, setCenter] = useState<LatLngExpression>(DEFAULT_LAB_CENTER);
   const [zoom, setZoom] = useState(18);
   const [bounds, setBounds] = useState<LatLngBoundsExpression | undefined>();
-  
+
+  // User location
+  const [userPosition, setUserPos] = useState<LatLngExpression | null>(null);
+  const [geolocationError, setGeolocationError] = useState<string | null>(null);
+
   // Items state
   const [items, setItems] = useState<MapItem[]>([]);
   
@@ -162,29 +171,36 @@ export function MapProvider({ children }: { children: ReactNode }) {
     center,
     zoom,
     bounds,
-    
+
+    // User location
+    userPosition,
+    geolocationError,
+    setUserPosition: useCallback((pos: LatLngExpression | null) => {
+      setUserPos(pos);
+    }, []),
+
     // Items
     items,
     addItem,
     updateItem,
     removeItem,
     clearItems,
-    
+
     // Routes
     routes,
     addRoute,
     removeRoute,
     clearRoutes,
-    
+
     // Layers
     layers,
     toggleLayer,
-    
+
     // View controls
     setView,
     fitBounds,
     focusOnItem,
-    
+
     // Interaction
     selectedItemId,
     selectItem,

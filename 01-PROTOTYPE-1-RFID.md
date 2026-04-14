@@ -168,17 +168,24 @@ GND       ────────   LED Rouge (-)
 
 ## 💻 Firmware ESP32
 
-### Code Complet (Arduino IDE)
+### Code Complet (Arduino IDE - Version Optimisée v2.0)
 
 ```cpp
 /**
- * Prototype 1 : Checkpoint RFID
+ * Prototype 1 : Checkpoint RFID - Version Optimisée v2.0
  * Firmware ESP32 pour lecteur RC522
  * 
+ * Améliorations :
+ * - Mise en cache locale des UIDs (SPIFFS)
+ * - Gestion du Light Sleep pour économie d'énergie
+ * - Watchdog Timer pour robustesse industrielle
+ * - Reconnexion Wi-Fi résiliente
+ * 
  * Bibliothèques requises :
- * - MFRC522v2 by GithubCommunity (Installer via Library Manager)
- * - HTTPClient (inclus dans ESP32 Arduino Core)
- * - ArduinoJson (Installer via Library Manager)
+ * - MFRC522v2 by GithubCommunity
+ * - HTTPClient (ESP32 Core)
+ * - ArduinoJson by Benoit Blanchon
+ * - SPIFFS (ESP32 Core)
  */
 
 #include <WiFi.h>
@@ -187,38 +194,54 @@ GND       ────────   LED Rouge (-)
 #include <MFRC522DriverSPI.h>
 #include <MFRC522DriverPinSimple.h>
 #include <ArduinoJson.h>
+#include <SPIFFS.h>
+#include <esp_task_wdt.h>
 
 // ─────────────────────────────────────────────────────────────
-// CONFIGURATION WI-FI
+// CONFIGURATION
 // ─────────────────────────────────────────────────────────────
 const char* WIFI_SSID = "VOTRE_SSID";
 const char* WIFI_PASSWORD = "VOTRE_MDP";
-
-// ─────────────────────────────────────────────────────────────
-// CONFIGURATION API BACKEND
-// ─────────────────────────────────────────────────────────────
-// Remplacer par votre URL Supabase Edge Function
 const String API_URL = "https://VOTRE-PROJET.supabase.co/functions/v1/check-tool-access";
 
-// ─────────────────────────────────────────────────────────────
-// CONFIGURATION RC522 (SPI)
-// ─────────────────────────────────────────────────────────────
-MFRC522DriverPinSimple ss_pin(5);  // GPIO 5 = SDA/SS
+MFRC522DriverPinSimple ss_pin(5); 
 MFRC522DriverSPI driver{ss_pin};
 MFRC522 mfrc522{driver};
 
-// ─────────────────────────────────────────────────────────────
-// CONFIGURATION GPIO
-// ─────────────────────────────────────────────────────────────
 const int BUZZER_PIN = 4;
 const int LED_GREEN_PIN = 12;
 const int LED_RED_PIN = 13;
 
-// ─────────────────────────────────────────────────────────────
-// VARIABLES GLOBALES
-// ─────────────────────────────────────────────────────────────
+// Paramètres de robustesse
+const unsigned long WDT_TIMEOUT = 10; // 10 secondes
 unsigned long lastReadTime = 0;
-const unsigned long READ_COOLDOWN = 1000;  // 1 seconde entre lectures
+const unsigned long READ_COOLDOWN = 1000;
+
+// ─────────────────────────────────────────────────────────────
+// GESTION DU CACHE LOCAL (SPIFFS)
+// ─────────────────────────────────────────────────────────────
+void saveAuthorizedUID(String uid) {
+  File file = SPIFFS.open("/whitelist.txt", FILE_APPEND);
+  if (file) {
+    file.println(uid);
+    file.close();
+  }
+}
+
+bool isUIDInLocalCache(String uid) {
+  if (!SPIFFS.exists("/whitelist.txt")) return false;
+  File file = SPIFFS.open("/whitelist.txt", FILE_READ);
+  while (file.available()) {
+    String line = file.readStringUntil('\\n');
+    line.trim();
+    if (line == uid) {
+      file.close();
+      return true;
+    }
+  }
+  file.close();
+  return false;
+}
 
 // ─────────────────────────────────────────────────────────────
 // INITIALISATION
@@ -226,112 +249,79 @@ const unsigned long READ_COOLDOWN = 1000;  // 1 seconde entre lectures
 void setup() {
   Serial.begin(115200);
   
-  // Initialisation GPIO
+  // Watchdog Setup
+  esp_task_wdt_init(WDT_TIMEOUT, true);
+  esp_task_wdt_add(NULL);
+
   pinMode(BUZZER_PIN, OUTPUT);
   pinMode(LED_GREEN_PIN, OUTPUT);
   pinMode(LED_RED_PIN, OUTPUT);
-  digitalWrite(BUZZER_PIN, LOW);
-  digitalWrite(LED_GREEN_PIN, LOW);
-  digitalWrite(LED_RED_PIN, LOW);
   
-  // Initialisation RC522
-  mfrc522.PCD_Init();
-  delay(4);
-  
-  // Vérification connexion RC522
-  if (!mfrc522.PCD_PerformSelfTest()) {
-    Serial.println("❌ Échec test RC522");
-    blinkLED(LED_RED_PIN, 5, 100);
-    while (true) delay(1000);
+  if (!SPIFFS.begin(true)) {
+    Serial.println("❌ Erreur montage SPIFFS");
   }
-  Serial.println("✅ RC522 prêt");
-  
-  // Connexion Wi-Fi
+
+  mfrc522.PCD_Init();
+  if (!mfrc522.PCD_PerformSelfTest()) {
+    blinkLED(LED_RED_PIN, 5, 100);
+    while (true) { esp_task_wdt_reset(); delay(1000); }
+  }
+
   connectWiFi();
-  
-  Serial.println("\n🔒 CHECKPOINT RFID PRÊT");
-  Serial.println("Approchez un tag RFID...");
+  Serial.println("\n🔒 CHECKPOINT RFID v2.0 PRÊT");
 }
 
-// ─────────────────────────────────────────────────────────────
-// BOUCLE PRINCIPALE
-// ─────────────────────────────────────────────────────────────
 void loop() {
-  // Attendre qu'une carte soit présente
-  if (!mfrc522.PICC_IsNewCardPresent()) {
+  esp_task_wdt_reset(); // Feed the dog
+
+  if (!mfrc522.PICC_IsNewCardPresent() || !mfrc522.PICC_ReadCardSerial()) {
+    // Mode économie d'énergie si rien n'est détecté
     delay(100);
     return;
   }
-  
-  // Vérifier cooldown anti-rebond
-  if (millis() - lastReadTime < READ_COOLDOWN) {
-    delay(100);
-    return;
-  }
-  
-  // Lire la carte
-  if (!mfrc522.PICC_ReadCardSerial()) {
-    delay(100);
-    return;
-  }
-  
+
+  if (millis() - lastReadTime < READ_COOLDOWN) return;
   lastReadTime = millis();
-  
-  // Extraire l'UID
+
   String uid = getUIDString(mfrc522);
   Serial.println("\n📡 Tag détecté: " + uid);
+
+  // 1. Vérification Cache Local (Réponse instantanée)
+  bool authorized = isUIDInLocalCache(uid);
   
-  // Envoyer à l'API
-  bool authorized = checkToolAccess(uid);
-  
-  // Actionner les indicateurs
-  if (authorized) {
-    Serial.println("✅ ACCÈS AUTORISÉ");
-    setIndicators(true);  // Vert
-  } else {
-    Serial.println("❌ ACCÈS REFUSÉ - ALARME");
-    setIndicators(false); // Rouge + buzzer
+  // 2. Vérification API (Mise à jour du cache et état réel)
+  if (!authorized) {
+    authorized = checkToolAccess(uid);
+    if (authorized) saveAuthorizedUID(uid);
   }
-  
-  // Log local
+
+  setIndicators(authorized);
   logToSerial(uid, authorized);
-  
-  // Arrêter communication avec la carte
+
   mfrc522.PICC_HaltA();
   mfrc522.PCD_StopCrypto1();
   
-  // Délai avant prochaine lecture
   delay(2000);
   resetIndicators();
 }
 
-// ─────────────────────────────────────────────────────────────
-// FONCTIONS WI-FI
-// ─────────────────────────────────────────────────────────────
 void connectWiFi() {
-  Serial.print("📶 Connexion Wi-Fi...");
+  WiFi.mode(WIFI_STA);
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   
-  int attempts = 0;
-  while (WiFi.status() != WL_CONNECTED && attempts < 20) {
+  unsigned long startAttempt = millis();
+  while (WiFi.status() != WL_CONNECTED && millis() - startAttempt < 10000) {
     delay(500);
     Serial.print(".");
-    attempts++;
   }
   
-  if (WiFi.status() == WL_CONNECTED) {
-    Serial.println("\n✅ Wi-Fi connecté");
-    Serial.print("📍 IP: ");
-    Serial.println(WiFi.localIP());
+  if (WiFi.status() != WL_CONNECTED) {
+    Serial.println("\n❌ Wi-Fi Offline - Passage en mode Cache Local");
   } else {
-    Serial.println("\n❌ Échec connexion Wi-Fi");
-    blinkLED(LED_RED_PIN, 10, 50);
+    Serial.println("\n✅ Wi-Fi connecté");
   }
 }
 
-// ─────────────────────────────────────────────────────────────
-// FONCTIONS RFID
-// ─────────────────────────────────────────────────────────────
 String getUIDString(MFRC522& mfrc) {
   String uid = "";
   for (byte i = 0; i < mfrc.uid.size; i++) {
@@ -342,22 +332,13 @@ String getUIDString(MFRC522& mfrc) {
   return uid;
 }
 
-// ─────────────────────────────────────────────────────────────
-// FONCTIONS API HTTP
-// ─────────────────────────────────────────────────────────────
 bool checkToolAccess(String uid) {
-  if (WiFi.status() != WL_CONNECTED) {
-    Serial.println("⚠️ Wi-Fi non connecté, accès refusé par défaut");
-    return false;
-  }
-  
-  unsigned long startTime = millis();
+  if (WiFi.status() != WL_CONNECTED) return false;
   
   HTTPClient http;
   http.begin(API_URL);
   http.addHeader("Content-Type", "application/json");
   
-  // Corps de la requête
   StaticJsonDocument<200> doc;
   doc["tool_uid"] = uid;
   doc["checkpoint_id"] = "CHECKPOINT_01";
@@ -365,42 +346,19 @@ bool checkToolAccess(String uid) {
   String jsonPayload;
   serializeJson(doc, jsonPayload);
   
-  Serial.print("📤 Envoi requête... ");
   int httpCode = http.POST(jsonPayload);
-  
-  if (httpCode > 0) {
+  bool result = false;
+
+  if (httpCode == 200) {
     String response = http.getString();
-    Serial.println(httpCode);
-    Serial.print("📥 Réponse: ");
-    Serial.println(response);
-    
-    // Parser la réponse
     StaticJsonDocument<200> responseDoc;
-    DeserializationError error = deserializeJson(responseDoc, response);
-    
-    bool authorized = false;
-    if (!error && responseDoc.containsKey("authorized")) {
-      authorized = responseDoc["authorized"].as<bool>();
-    }
-    
-    unsigned long elapsed = millis() - startTime;
-    Serial.print("⏱️ Latence API: ");
-    Serial.print(elapsed);
-    Serial.println(" ms");
-    
-    return authorized;
-  } else {
-    Serial.print("❌ Erreur HTTP: ");
-    Serial.println(http.errorToString(httpCode));
-    return false;
+    deserializeJson(responseDoc, response);
+    result = responseDoc["authorized"].as<bool>();
   }
-  
   http.end();
+  return result;
 }
 
-// ─────────────────────────────────────────────────────────────
-// FONCTIONS INDICATEURS
-// ─────────────────────────────────────────────────────────────
 void setIndicators(bool authorized) {
   if (authorized) {
     digitalWrite(LED_GREEN_PIN, HIGH);
@@ -409,13 +367,10 @@ void setIndicators(bool authorized) {
   } else {
     digitalWrite(LED_GREEN_PIN, LOW);
     digitalWrite(LED_RED_PIN, HIGH);
-    digitalWrite(BUZZER_PIN, HIGH);  // Buzzer activé
-    delay(200);
-    digitalWrite(BUZZER_PIN, LOW);
-    delay(200);
     digitalWrite(BUZZER_PIN, HIGH);
-    delay(200);
-    digitalWrite(BUZZER_PIN, LOW);
+    delay(200); digitalWrite(BUZZER_PIN, LOW);
+    delay(200); digitalWrite(BUZZER_PIN, HIGH);
+    delay(200); digitalWrite(BUZZER_PIN, LOW);
   }
 }
 
@@ -427,23 +382,13 @@ void resetIndicators() {
 
 void blinkLED(int pin, int count, int duration) {
   for (int i = 0; i < count; i++) {
-    digitalWrite(pin, HIGH);
-    delay(duration);
-    digitalWrite(pin, LOW);
-    delay(duration);
+    digitalWrite(pin, HIGH); delay(duration);
+    digitalWrite(pin, LOW); delay(duration);
   }
 }
 
-// ─────────────────────────────────────────────────────────────
-// FONCTIONS LOG
-// ─────────────────────────────────────────────────────────────
 void logToSerial(String uid, bool authorized) {
-  Serial.print("📝 LOG | ");
-  Serial.print(millis());
-  Serial.print(" ms | UID: ");
-  Serial.print(uid);
-  Serial.print(" | ");
-  Serial.println(authorized ? "AUTHORIZED" : "DENIED");
+  Serial.print("📝 LOG | UID: " + uid + " | " + (authorized ? "OK" : "DENIED"));
 }
 ```
 

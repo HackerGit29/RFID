@@ -18,10 +18,10 @@ export default function FilterChips({
           <button
             key={filter}
             onClick={() => onSelectFilter(filter)}
-            className={`flex-none px-6 py-2 rounded-lg font-bold text-sm transition-colors ${
+            className={`flex-none px-6 py-3 rounded-full font-bold text-sm transition-all ${
               isActive
-                ? 'bg-primary text-white'
-                : 'bg-surface-container-high text-on-surface-variant font-semibold hover:bg-surface-bright'
+                ? 'bg-[#06C167] text-black shadow-uber-md'
+                : 'bg-[#121212] text-white/60 font-semibold hover:bg-[#1E1E1E] border border-white/10'
             }`}
           >
             {filter}

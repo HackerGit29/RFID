@@ -37,13 +37,13 @@ export default function ThemeToggle() {
   return (
     <button
       onClick={handleThemeChange}
-      className="flex items-center gap-2 px-4 py-2 rounded-lg bg-surface-container-highest hover:bg-surface-bright transition-colors active:scale-95"
+      className="flex items-center gap-2 px-4 py-2 rounded-[999px] bg-[#121212] hover:bg-[#1a1a1a] transition-all active:scale-95 border border-white/10"
       title={`Thème: ${getThemeLabel()}`}
     >
-      <span className="material-symbols-outlined text-primary">
+      <span className="material-symbols-outlined text-[#06C167]">
         {getThemeIcon()}
       </span>
-      <span className="text-sm font-bold text-on-surface hidden sm:inline">
+      <span className="text-sm font-bold text-white hidden sm:inline">
         {getThemeLabel()}
       </span>
     </button>

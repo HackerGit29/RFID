@@ -8,78 +8,112 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Surface colors
-        surface: 'var(--surface)',
-        'surface-container': 'var(--surface-container)',
-        'surface-container-high': 'var(--surface-container-high)',
-        'surface-container-highest': 'var(--surface-container-highest)',
-        'surface-container-low': 'var(--surface-container-low)',
-        'surface-container-lowest': 'var(--surface-container-lowest)',
-        'surface-bright': 'var(--surface-bright)',
-        'surface-dim': 'var(--surface-dim)',
-        'surface-variant': 'var(--surface-variant)',
+        // Uber Design System
+        black: '#000000',
+        white: '#ffffff',
         
-        // Primary colors
-        primary: 'var(--primary)',
-        'primary-container': 'var(--primary-container)',
-        'primary-fixed': 'var(--primary-fixed)',
-        'primary-fixed-dim': 'var(--primary-fixed-dim)',
-        'on-primary': 'var(--on-primary)',
-        'on-primary-container': 'var(--on-primary-container)',
-        'on-primary-fixed': 'var(--on-primary-fixed)',
-        'on-primary-fixed-variant': 'var(--on-primary-fixed-variant)',
+        // Surface - Uber style (dark primary)
+        surface: '#000000',
+        'surface-container': '#121212',
+        'surface-container-high': '#1E1E1E',
+        'surface-container-highest': '#2A2A2A',
+        'surface-container-low': '#0A0A0A',
+        'surface-container-lowest': '#050505',
+        'surface-bright': '#333333',
+        'surface-dim': '#000000',
+        'surface-variant': '#1A1A1A',
         
-        // Secondary colors
-        secondary: 'var(--secondary)',
-        'secondary-container': 'var(--secondary-container)',
-        'secondary-fixed': 'var(--secondary-fixed)',
-        'secondary-fixed-dim': 'var(--secondary-fixed-dim)',
-        'on-secondary': 'var(--on-secondary)',
-        'on-secondary-container': 'var(--on-secondary-container)',
-        'on-secondary-fixed': 'var(--on-secondary-fixed)',
-        'on-secondary-fixed-variant': 'var(--on-secondary-fixed-variant)',
+        // Primary - Uber green
+        primary: '#06C167',
+        'primary-container': '#06C167',
+        'primary-fixed': '#06C167',
+        'primary-fixed-dim': '#06C167',
+        'on-primary': '#000000',
+        'on-primary-container': '#000000',
+        'on-primary-fixed': '#000000',
+        'on-primary-fixed-variant': '#000000',
         
-        // Tertiary colors
-        tertiary: 'var(--tertiary)',
-        'tertiary-container': 'var(--tertiary-container)',
-        'tertiary-fixed': 'var(--tertiary-fixed)',
-        'tertiary-fixed-dim': 'var(--tertiary-fixed-dim)',
-        'on-tertiary': 'var(--on-tertiary)',
-        'on-tertiary-container': 'var(--on-tertiary-container)',
-        'on-tertiary-fixed': 'var(--on-tertiary-fixed)',
-        'on-tertiary-fixed-variant': 'var(--on-tertiary-fixed-variant)',
+        // Secondary
+        secondary: '#06C167',
+        'secondary-container': '#06C167',
+        'secondary-fixed': '#06C167',
+        'secondary-fixed-dim': '#06C167',
+        'on-secondary': '#000000',
+        'on-secondary-container': '#000000',
+        'on-secondary-fixed': '#000000',
+        'on-secondary-fixed-variant': '#000000',
         
-        // Other colors
-        error: 'var(--error)',
-        'error-container': 'var(--error-container)',
-        'on-error': 'var(--on-error)',
-        'on-error-container': 'var(--on-error-container)',
-        outline: 'var(--outline)',
-        'outline-variant': 'var(--outline-variant)',
-        background: 'var(--background)',
-        'on-background': 'var(--on-background)',
-        'on-surface': 'var(--on-surface)',
-        'on-surface-variant': 'var(--on-surface-variant)',
-        'inverse-surface': 'var(--inverse-surface)',
-        'inverse-on-surface': 'var(--inverse-on-surface)',
-        'inverse-primary': 'var(--inverse-primary)',
+        // Tertiary
+        tertiary: '#06C167',
+        'tertiary-container': '#06C167',
+        'tertiary-fixed': '#06C167',
+        'tertiary-fixed-dim': '#06C167',
+        'on-tertiary': '#000000',
+        'on-tertiary-container': '#000000',
+        'on-tertiary-fixed': '#000000',
+        'on-tertiary-fixed-variant': '#000000',
+        
+        // Error
+        error: '#FF3B30',
+        'error-container': '#FF3B30',
+        'on-error': '#FFFFFF',
+        'on-error-container': '#FFFFFF',
+        
+        // On Surface
+        'on-surface': '#FFFFFF',
+        'on-surface-variant': '#A0A0A0',
+        
+        // Outline
+        outline: '#333333',
+        'outline-variant': '#2A2A2A',
+        
+        // Background
+        background: '#000000',
+        'on-background': '#FFFFFF',
+        
+        // Inverse
+        'inverse-surface': '#FFFFFF',
+        'inverse-on-surface': '#000000',
+        'inverse-primary': '#000000',
+        
+        // Legacy support
+        'surface/60': 'rgba(0, 0, 0, 0.6)',
       },
       fontFamily: {
-        headline: ['Manrope', 'sans-serif'],
-        body: ['Inter', 'sans-serif'],
-        label: ['Inter', 'sans-serif'],
+        // Uber Move (headings)
+        headline: ['Uber Move', 'Manrope', 'sans-serif'],
+        'font-headline': ['Uber Move', 'Manrope', 'sans-serif'],
+        // Uber Move Text (body)
+        body: ['Uber Move Text', 'Inter', 'sans-serif'],
+        'font-body': ['Uber Move Text', 'Inter', 'sans-serif'],
+        // Fallbacks
         manrope: ['Manrope', 'sans-serif'],
         inter: ['Inter', 'sans-serif'],
+        uber: ['Uber Move', 'sans-serif'],
+        uberText: ['Uber Move Text', 'sans-serif'],
       },
       borderRadius: {
         DEFAULT: '8px',
-        lg: '8px',
-        xl: '8px',
-        '2xl': '8px',
-        full: '9999px',
+        lg: '12px',
+        xl: '16px',
+        '2xl': '24px',
+        // Uber pill buttons
+        '999px': '999px',
+        pill: '999px',
+        full: '999px',
       },
       boxShadow: {
-        'glass': '0px_16px_40px_rgba(6,14,32,0.4)',
+        // Uber whisper-soft shadows (0.12-0.16 opacity)
+        'uber-sm': '0 2px 4px rgba(0, 0, 0, 0.12)',
+        'uber-md': '0 4px 12px rgba(0, 0, 0, 0.14)',
+        'uber-lg': '0 8px 24px rgba(0, 0, 0, 0.16)',
+        'uber-xl': '0 16px 48px rgba(0, 0, 0, 0.18)',
+        // Legacy glass
+        'glass': '0 16px 40px rgba(6, 14, 32, 0.4)',
+      },
+      spacing: {
+        'uber-safe': 'env(safe-area-inset-top)',
+        'uber-safe-bottom': 'env(safe-area-inset-bottom)',
       },
     },
   },

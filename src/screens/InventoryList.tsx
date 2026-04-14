@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
 import SwipeGesture from '../components/SwipeGesture';
@@ -7,6 +6,7 @@ import SearchBar from '../components/SearchBar';
 import FilterChips from '../components/FilterChips';
 import ToolCard from '../components/ToolCard';
 import { Tool } from '../types';
+import { useUIFilters } from '../contexts/UIFiltersContext';
 
 const filters = ['Tous', 'RFID', 'BLE', 'RFID+BLE'];
 
@@ -44,7 +44,7 @@ const sampleTools: Tool[] = [
 ];
 
 export default function InventoryList() {
-  const [activeFilter, setActiveFilter] = useState('Tous');
+  const { activeFilter, setActiveFilter } = useUIFilters();
   const navigate = useNavigate();
 
   const handleSwipeBack = () => {
@@ -62,7 +62,7 @@ export default function InventoryList() {
 
   return (
     <SwipeGesture onSwipeLeft={handleSwipeBack}>
-      <div className="bg-surface text-on-surface min-h-screen pb-32">
+      <div className="bg-[#000000] text-white min-h-screen pb-32">
       <TopBar
         title="Inventaire"
         showSettings
@@ -72,10 +72,10 @@ export default function InventoryList() {
       <main className="pt-24 pb-32 px-6 max-w-2xl mx-auto">
         {/* Header */}
         <section className="mb-8">
-          <h2 className="font-headline text-4xl font-extrabold tracking-tight text-on-surface">
+          <h2 className="font-headline text-4xl font-extrabold tracking-tight text-white">
             Inventaire
           </h2>
-          <p className="font-label text-xs font-bold uppercase tracking-widest text-primary mt-2">
+          <p className="font-label text-xs font-bold uppercase tracking-widest text-[#06C167] mt-2">
             127 OUTILS · 3 CATÉGORIES
           </p>
         </section>
@@ -94,11 +94,11 @@ export default function InventoryList() {
         {/* Grouped List */}
         <section className="space-y-8">
           <div className="space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-              <h3 className="font-headline text-lg font-bold text-on-surface">
+            <div className="flex items-center justify-between border-b border-white/10 pb-2">
+              <h3 className="font-headline text-lg font-bold text-white">
                 Électroportatif
               </h3>
-              <span className="text-[10px] font-bold text-outline uppercase tracking-widest">
+              <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">
                 42 Outils
               </span>
             </div>
@@ -109,11 +109,11 @@ export default function InventoryList() {
           </div>
 
           <div className="space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-              <h3 className="font-headline text-lg font-bold text-on-surface">
+            <div className="flex items-center justify-between border-b border-white/10 pb-2">
+              <h3 className="font-headline text-lg font-bold text-white">
                 Mesure & Traçage
               </h3>
-              <span className="text-[10px] font-bold text-outline uppercase tracking-widest">
+              <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">
                 15 Outils
               </span>
             </div>
@@ -125,8 +125,8 @@ export default function InventoryList() {
         </section>
       </main>
 
-      {/* FAB */}
-      <button className="fixed right-6 bottom-28 w-14 h-14 bg-primary rounded-lg shadow-xl shadow-blue-900/20 flex items-center justify-center text-white active:scale-90 transition-transform z-40">
+      {/* FAB - Uber style */}
+      <button className="fixed right-6 bottom-28 w-14 h-14 bg-[#06C167] rounded-full shadow-uber-lg flex items-center justify-center text-white active:scale-90 transition-transform z-40">
         <span className="material-symbols-outlined text-3xl">add</span>
       </button>
 

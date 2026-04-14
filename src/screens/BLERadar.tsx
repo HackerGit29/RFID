@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import BottomNav from '../components/BottomNav';
 import SearchBar from '../components/SearchBar';
 import LeafletMap from '../components/LeafletMap';
 import { MapProvider, useMapContext, MapItem } from '../contexts/MapContext';
+import { useUIFilters } from '../contexts/UIFiltersContext';
 import { BLEDevice } from '../types';
 
 const bleDevices: BLEDevice[] = [
@@ -34,8 +35,9 @@ const bleDevices: BLEDevice[] = [
 
 function BLERadarContent() {
   const { addItem, clearItems, addRoute, items } = useMapContext();
-  const [radarEnabled, setRadarEnabled] = useState(true);
-  const [selectedDevice, setSelectedDevice] = useState<string | null>(null);
+  const { activeFilter, setActiveFilter } = useUIFilters();
+
+  const radarEnabled = true; // Always enabled for now; can be moved to context later
 
   // Initialize map with lab items
   useEffect(() => {
@@ -109,10 +111,10 @@ function BLERadarContent() {
   };
 
   return (
-    <div className="relative flex h-screen w-full flex-col overflow-hidden bg-surface text-on-surface">
+    <div className="relative flex h-screen w-full flex-col overflow-hidden bg-black text-white">
       {/* MAP LAYER - Full Screen */}
       <div className="absolute inset-0">
-        <LeafletMap 
+        <LeafletMap
           className="h-full w-full"
           showControls={true}
         />
@@ -123,7 +125,7 @@ function BLERadarContent() {
         {/* Status/Nav Header */}
         <div className="flex items-center justify-between glass-header p-2 px-4 rounded-xl pointer-events-auto">
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center size-10 rounded-lg bg-primary-container text-primary">
+            <div className="flex items-center justify-center size-10 rounded-lg bg-[#06C167] text-black">
               <span className="material-symbols-outlined" style={{ fontVariationSettings: '"FILL" 1' }}>
                 bluetooth
               </span>
@@ -132,20 +134,19 @@ function BLERadarContent() {
               <h1 className="text-sm font-headline font-bold text-white tracking-tight leading-none">
                 Radar BLE
               </h1>
-              <span className="text-[10px] font-label font-bold text-tertiary uppercase tracking-widest">
+              <span className="text-[10px] font-label font-bold text-[#06C167] uppercase tracking-widest">
                 {radarEnabled ? 'Actif' : 'Inactif'}
               </span>
             </div>
           </div>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-label font-bold text-on-surface-variant uppercase">
+              <span className="text-[10px] font-label font-bold text-white/70 uppercase">
                 Radar
               </span>
-              <button
-                onClick={() => setRadarEnabled(!radarEnabled)}
-                className={`w-10 h-5 rounded-full relative transition-colors pointer-events-auto ${
-                  radarEnabled ? 'bg-tertiary' : 'bg-surface-container-high'
+              <div
+                className={`w-10 h-5 rounded-full relative ${
+                  radarEnabled ? 'bg-[#06C167]' : 'bg-white/20'
                 }`}
               >
                 <div
@@ -153,7 +154,7 @@ function BLERadarContent() {
                     radarEnabled ? 'right-0.5' : 'left-0.5'
                   }`}
                 />
-              </button>
+              </div>
             </div>
           </div>
         </div>
@@ -161,18 +162,18 @@ function BLERadarContent() {
         {/* Search & Filters */}
         <div className="flex gap-2 pointer-events-auto">
           <SearchBar placeholder="Rechercher un outil..." />
-          <button className="bg-surface-container-highest/60 backdrop-blur-md px-4 rounded-xl flex items-center gap-2">
+          <button className="bg-white/10 backdrop-blur-md px-4 rounded-xl flex items-center gap-2">
             <span className="text-sm font-medium text-white">Tous</span>
-            <span className="material-symbols-outlined text-primary text-sm">filter_list</span>
+            <span className="material-symbols-outlined text-[#06C167] text-sm">filter_list</span>
           </button>
         </div>
       </div>
 
       {/* BOTTOM SHEET - Overlay */}
-      <div className="absolute bottom-0 left-0 right-0 z-30 bg-surface-container-high/90 backdrop-blur-3xl rounded-t-[2rem] border-t border-white/5 pb-8 shadow-[0_-20px_50px_rgba(0,0,0,0.5)]">
+      <div className="absolute bottom-0 left-0 right-0 z-30 bg-black/90 backdrop-blur-3xl rounded-t-[2rem] border-t border-white/10 pb-8 shadow-uber-xl">
         {/* Drag Handle */}
         <div className="flex justify-center pt-3 pb-4">
-          <div className="w-10 h-1 rounded-full bg-secondary-fixed-dim/20" />
+          <div className="w-10 h-1 rounded-full bg-white/20" />
         </div>
 
         <div className="px-6 space-y-6">
@@ -182,12 +183,12 @@ function BLERadarContent() {
               <h2 className="text-lg font-headline font-bold text-white">
                 Recherche d'outils...
               </h2>
-              <p className="text-xs text-on-surface-variant font-body">
+              <p className="text-xs text-white/70 font-body">
                 {items.length} outil(s) détecté(s)
               </p>
             </div>
-            <div className="bg-primary-container px-3 py-1.5 rounded-lg">
-              <span className="text-xs font-label font-bold text-primary uppercase">
+            <div className="bg-[#06C167] px-3 py-1.5 rounded-lg">
+              <span className="text-xs font-label font-bold text-black uppercase">
                 {items.length} Détectés
               </span>
             </div>
@@ -198,15 +199,12 @@ function BLERadarContent() {
             {bleDevices.map((device) => (
               <div
                 key={device.id}
-                onClick={() => setSelectedDevice(device.id)}
-                className={`min-w-[200px] bg-surface-container-highest p-4 rounded-2xl flex flex-col gap-3 border cursor-pointer transition-all ${
-                  selectedDevice === device.id ? 'border-primary' : 'border-white/5'
-                }`}
+                className="min-w-[200px] bg-white/5 p-4 rounded-2xl flex flex-col gap-3 border border-white/5"
               >
                 <div className="flex items-start justify-between">
-                  <div className="size-10 rounded-xl bg-tertiary/10 flex items-center justify-center">
+                  <div className="size-10 rounded-xl bg-[#06C167]/10 flex items-center justify-center">
                     <span
-                      className="material-symbols-outlined text-tertiary"
+                      className="material-symbols-outlined text-[#06C167]"
                       style={{ fontVariationSettings: '"FILL" 1' }}
                     >
                       {device.icon}
@@ -219,9 +217,9 @@ function BLERadarContent() {
                 <div>
                   <h3 className="text-sm font-bold text-white leading-tight">{device.name}</h3>
                   <div className="flex items-center gap-2 mt-1">
-                    <span className="text-xs text-primary font-bold">{device.distance}m</span>
-                    <span className="text-[10px] text-on-surface-variant">•</span>
-                    <span className="text-[10px] text-on-surface-variant font-medium">
+                    <span className="text-xs text-[#06C167] font-bold">{device.distance}m</span>
+                    <span className="text-[10px] text-white/50">•</span>
+                    <span className="text-[10px] text-white/50 font-medium">
                       {device.rssi} dBm
                     </span>
                   </div>
@@ -239,9 +237,5 @@ function BLERadarContent() {
 }
 
 export default function BLERadar() {
-  return (
-    <MapProvider>
-      <BLERadarContent />
-    </MapProvider>
-  );
+  return <BLERadarContent />;
 }

@@ -1,4 +1,4 @@
-# 📡 Prototype 2 : Le "Radar/Map" de Suivi en Temps Réel (BLE)
+# 📡 Prototype 2 : Le "Radar" de Suivi en Temps Réel (BLE)
 
 **Technologie :** Bluetooth Low Energy (BLE)  
 **Objectif :** Localisation en temps réel (RTLS) d'outils dans le laboratoire  
@@ -35,8 +35,8 @@
 │         Packet: UUID + Major + Minor + TX Power + RSSI          │
 │                                                                  │
 │  [SMARTPHONE Android/iOS]                                        │
-│         │                                                        │
-│         ▼ (2) Scan BLE (flutter_blue_plus / react-native-ble-plx)│
+│         │                                                    │
+│         ▼ (2) Scan BLE 
 │         Capture: RSSI (dBm) + MAC Address + Timestamp            │
 │                                                                  │
 │  [Application Mobile]                                            │

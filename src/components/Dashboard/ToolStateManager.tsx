@@ -1,6 +1,7 @@
-import React, { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { Tool } from '../../types';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useUIFilters } from '../../contexts/UIFiltersContext';
 
 interface ToolStateManagerProps {
   tools: Tool[];
@@ -8,8 +9,7 @@ interface ToolStateManagerProps {
 }
 
 export default function ToolStateManager({ tools, onToggleState }: ToolStateManagerProps) {
-  const [search, setSearch] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('All');
+  const { toolSearch, setToolSearch, toolCategoryFilter, setToolCategoryFilter } = useUIFilters();
 
   const categories = useMemo(() => {
     const cats = new Set(tools.map(t => t.category));
@@ -18,12 +18,12 @@ export default function ToolStateManager({ tools, onToggleState }: ToolStateMana
 
   const filteredTools = useMemo(() => {
     return tools.filter(t => {
-      const matchesSearch = t.name.toLowerCase().includes(search.toLowerCase()) ||
-                            t.serialNumber.toLowerCase().includes(search.toLowerCase());
-      const matchesCategory = categoryFilter === 'All' || t.category === categoryFilter;
+      const matchesSearch = t.name.toLowerCase().includes(toolSearch.toLowerCase()) ||
+                            t.serialNumber.toLowerCase().includes(toolSearch.toLowerCase());
+      const matchesCategory = toolCategoryFilter === 'All' || t.category === toolCategoryFilter;
       return matchesSearch && matchesCategory;
     });
-  }, [tools, search, categoryFilter]);
+  }, [tools, toolSearch, toolCategoryFilter]);
 
   const handleBulkLock = async () => {
     const lockPromises = tools
@@ -43,15 +43,15 @@ export default function ToolStateManager({ tools, onToggleState }: ToolStateMana
               type="text"
               placeholder="Search tools..."
               className="w-full pl-9 pr-4 py-2 rounded-xl bg-surface-container-high text-xs border border-outline/10 focus:border-primary outline-none transition-all"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              value={toolSearch}
+              onChange={(e) => setToolSearch(e.target.value)}
             />
           </div>
 
           <select
             className="bg-surface-container-high text-xs border border-outline/10 rounded-xl px-3 py-2 outline-none focus:border-primary transition-all"
-            value={categoryFilter}
-            onChange={(e) => setCategoryFilter(e.target.value)}
+            value={toolCategoryFilter}
+            onChange={(e) => setToolCategoryFilter(e.target.value)}
           >
             {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
           </select>
