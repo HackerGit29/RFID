@@ -81,7 +81,7 @@ export default function SplashScreen() {
         
         {/* App Identity */}
         <div className="mt-10 text-center">
-          <h1 className="font-headline text-[28px] font-extrabold tracking-tight text-white leading-none mb-3">
+          <h1 className="font-headline text-[28px] font-extrabold tracking-tight text-[#FAFAFA] leading-none mb-3">
             ToolTracker Pro
           </h1>
           <p className="font-body text-sm font-medium tracking-wide text-outline uppercase tracking-[0.1em]">

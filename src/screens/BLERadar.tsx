@@ -1,237 +1,219 @@
-import { useEffect } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
+import { Capacitor } from '@capacitor/core';
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import BottomNav from '../components/BottomNav';
 import SearchBar from '../components/SearchBar';
 import LeafletMap from '../components/LeafletMap';
-import { MapProvider, useMapContext, MapItem } from '../contexts/MapContext';
-import { useUIFilters } from '../contexts/UIFiltersContext';
-import { BLEDevice } from '../types';
-
-const bleDevices: BLEDevice[] = [
-  {
-    id: '1',
-    name: 'Caisse à outils Pro-X',
-    distance: 1.2,
-    rssi: -52,
-    smoothedRssi: -55,
-    status: 'hot',
-    icon: 'handyman',
-    lastPing: Date.now(),
-  },
-  {
-    id: '2',
-    name: 'Perceuse Hilti TE 6',
-    distance: 8.4,
-    rssi: -78,
-    smoothedRssi: -76,
-    status: 'warm',
-    icon: 'precision_manufacturing',
-    lastPing: Date.now() - 5000,
-  },
-  {
-    id: '3',
-    name: 'Générateur G-300',
-    distance: 22.0,
-    rssi: -92,
-    smoothedRssi: -90,
-    status: 'cold',
-    icon: 'electric_bolt',
-    lastPing: Date.now() - 15000,
-  },
-];
+import { useMapContext } from '../contexts/MapContext';
+import { useBLEScannerContext } from '../contexts/BLEScannerContext';
+import { BLEDeviceCard, ProximityIndicator, SignalStrengthBar } from '../components/BLE';
+import { HotColdFinder, HotColdGuidance } from '../utils/bleFilters';
 
 function BLERadarContent() {
-  const { addItem, clearItems, addRoute, items } = useMapContext();
-  const { activeFilter, setActiveFilter } = useUIFilters();
+  const { addItem, clearItems, items } = useMapContext();
+  const { devices, isScanning, startScan, stopScan, error } = useBLEScannerContext();
+  
+  const [selectedDeviceId, setSelectedDeviceId] = useState<string | null>(null);
+  const [hotColdGuidance, setHotColdGuidance] = useState<HotColdGuidance | null>(null);
+  
+  const hotColdFinder = useMemo(() => new HotColdFinder(), []);
+  
+  const selectedDevice = useMemo(
+    () => devices.find(d => d.id === selectedDeviceId) || null,
+    [devices, selectedDeviceId]
+  );
 
-  const radarEnabled = true; // Always enabled for now; can be moved to context later
-
-  // Initialize map with lab items
+  // Auto-start scanning on mount
   useEffect(() => {
-    // Clear existing items
+    startScan();
+    return () => stopScan();
+  }, [startScan, stopScan]);
+
+  // Update map items when devices change
+  useEffect(() => {
     clearItems();
-    
-    // Add lab zones (example positions - à adapter selon votre labo réel)
-    const labCenter: [number, number] = [48.8566, 2.3522]; // Paris (à modifier)
-    
-    // Add tools as map items
-    bleDevices.forEach((device, index) => {
-      const offsetLat = (index - 1) * 0.0001; // ~10m spacing
-      const offsetLng = (index - 1) * 0.0001;
-      
+
+    const labCenter: [number, number] = [48.8566, 2.3522];
+
+    devices.forEach((device, index) => {
+      const offset = (index - Math.floor(devices.length / 2)) * 0.0001;
+
       addItem({
         id: device.id,
         name: device.name,
         type: 'tool',
-        position: [labCenter[0] + offsetLat, labCenter[1] + offsetLng],
+        position: [labCenter[0] + offset, labCenter[1] + offset],
         status: device.status === 'hot' ? 'available' : device.status === 'warm' ? 'in_use' : 'lost',
         rssi: device.rssi,
         distance: device.distance,
         icon: device.icon,
         metadata: {
           status: device.status,
-          distance: `${device.distance}m`,
+          distance: `${device.distance.toFixed(1)}m`,
         },
       });
     });
-    
-    // Add example route (chemin entre les outils)
-    if (items.length === 0) {
-      addRoute({
-        id: 'patrol-route-1',
-        name: 'Parcours de ronde',
-        path: bleDevices.map((_, index) => [
-          labCenter[0] + (index - 1) * 0.0001,
-          labCenter[1] + (index - 1) * 0.0001,
-        ]),
-        color: '#357df1',
-        width: 2,
-        dashed: true,
-      });
+  }, [devices, clearItems, addItem]);
+
+  // Update hot/cold guidance when selected device changes
+  useEffect(() => {
+    if (selectedDevice) {
+      const guidance = hotColdFinder.update(selectedDevice.distance);
+      setHotColdGuidance(guidance);
+      
+      // Haptic feedback based on proximity
+      if (Capacitor.isNativePlatform()) {
+        if (selectedDevice.status === 'hot') {
+          Haptics.impact({ style: ImpactStyle.Heavy });
+        } else if (selectedDevice.status === 'warm') {
+          Haptics.impact({ style: ImpactStyle.Medium });
+        } else {
+          Haptics.impact({ style: ImpactStyle.Light });
+        }
+      }
+    } else {
+      hotColdFinder.reset();
+      setHotColdGuidance(null);
     }
+  }, [selectedDevice, hotColdFinder]);
+
+  const handleDeviceSelect = useCallback(async (deviceId: string) => {
+    if (Capacitor.isNativePlatform()) {
+      await Haptics.impact({ style: ImpactStyle.Light });
+    }
+    setSelectedDeviceId(prev => prev === deviceId ? null : deviceId);
   }, []);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'hot':
-        return 'text-primary bg-primary/20 border-primary/30';
-      case 'warm':
-        return 'text-tertiary bg-tertiary/20 border-tertiary/30';
-      case 'cold':
-        return 'text-error bg-error/20 border-error/30';
-      default:
-        return 'text-[#FAFAFA]/60 bg-[#FAFAFA]/10 border-[#FAFAFA]/20';
-    }
-  };
-
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case 'hot':
-        return 'Chaud';
-      case 'warm':
-        return 'Moyen';
-      case 'cold':
-        return 'Faible';
-      default:
-        return 'Inconnu';
-    }
-  };
-
   return (
-    <div className="relative flex h-screen w-full flex-col overflow-hidden bg-gradient-to-b from-[#0A0A0A] via-[#0F0F0F] to-[#050505] text-[#FAFAFA]">
+    <div className="relative flex h-screen w-full flex-col overflow-hidden bg-black text-white">
       {/* MAP LAYER - Full Screen */}
-      <div className="absolute inset-0 opacity-80">
-        <LeafletMap
-          className="h-full w-full"
-          showControls={true}
-        />
+      <div className="absolute inset-0">
+        <LeafletMap className="h-full w-full" showControls={true} />
       </div>
 
-      {/* TOP BAR (HUD) - Overlay */}
-      <div className="fixed top-0 left-0 right-0 z-20 p-4 flex flex-col gap-4 pointer-events-none">
-        {/* Status/Nav Header */}
-        <div className="flex items-center justify-between glass-panel p-2 px-4 rounded-xl pointer-events-auto">
+      {/* TOP HUD - Overlay */}
+      <div className="fixed top-0 left-0 right-0 z-20 p-4 flex flex-col gap-3 pointer-events-none">
+        {/* Status Header */}
+        <div className="flex items-center justify-between glass-header p-3 px-4 rounded-xl pointer-events-auto">
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center size-10 rounded-lg bg-primary text-black">
+            <div className="flex items-center justify-center size-10 rounded-lg bg-[#06C167] text-black">
               <span className="material-symbols-outlined" style={{ fontVariationSettings: '"FILL" 1' }}>
                 bluetooth
               </span>
             </div>
             <div>
-              <h1 className="text-sm font-headline font-bold text-[#FAFAFA] tracking-tight leading-none">
-                Radar BLE
-              </h1>
-              <span className="text-[10px] font-label font-bold text-primary uppercase tracking-widest">
-                {radarEnabled ? 'Actif' : 'Inactif'}
+              <h1 className="text-sm font-bold text-white tracking-tight">Radar BLE</h1>
+              <span className="text-[10px] font-bold text-[#06C167] uppercase tracking-wider">
+                {isScanning ? `${devices.length} devices` : 'Paused'}
               </span>
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-label font-bold text-[#FAFAFA]/70 uppercase">
-                Radar
-              </span>
-              <div
-                className={`w-10 h-5 rounded-full relative ${
-                  radarEnabled ? 'bg-primary' : 'bg-white/20'
-                }`}
-              >
-                <div
-                  className={`absolute top-0.5 size-4 bg-white rounded-full transition-transform ${
-                    radarEnabled ? 'right-0.5' : 'left-0.5'
-                  }`}
-                />
+          
+          <button
+            onClick={() => isScanning ? stopScan() : startScan()}
+            className={`w-12 h-6 rounded-full relative transition-colors ${
+              isScanning ? 'bg-[#06C167]' : 'bg-white/20'
+            }`}
+          >
+            <div
+              className={`absolute top-1 size-4 bg-white rounded-full transition-transform ${
+                isScanning ? 'right-1' : 'left-1'
+              }`}
+            />
+          </button>
+        </div>
+
+        {/* Hot/Cold Guidance HUD */}
+        {hotColdGuidance && selectedDevice && (
+          <div
+            className="glass-header p-4 rounded-xl pointer-events-auto border-l-4"
+            style={{ borderColor: hotColdGuidance.color }}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <ProximityIndicator rssi={selectedDevice.smoothedRssi} size="md" animated />
+                <div className="text-left">
+                  <h2 className="text-sm font-bold text-white">{selectedDevice.name}</h2>
+                  <p className="text-xs text-white/70 mt-0.5">{hotColdGuidance.direction}</p>
+                  <SignalStrengthBar rssi={selectedDevice.smoothedRssi} className="mt-2" />
+                </div>
+              </div>
+              
+              <div className="text-right">
+                <p className="text-2xl font-bold" style={{ color: hotColdGuidance.color }}>
+                  {hotColdGuidance.emoji} {hotColdGuidance.status}
+                </p>
+                <p className="text-lg font-bold text-white mt-0.5">
+                  {selectedDevice.distance.toFixed(1)}m
+                </p>
+                <p className="text-[10px] text-white/50">
+                  {(hotColdGuidance.confidence * 100).toFixed(0)}% confidence
+                </p>
               </div>
             </div>
           </div>
-        </div>
+        )}
 
-        {/* Search & Filters */}
-        <div className="flex gap-2 pointer-events-auto">
-          <SearchBar placeholder="Rechercher un outil..." />
-          <button className="glass-panel px-4 rounded-xl flex items-center gap-2">
-            <span className="text-sm font-medium text-[#FAFAFA]">Tous</span>
-            <span className="material-symbols-outlined text-primary text-sm">filter_list</span>
-          </button>
+        {/* Search Bar */}
+        <div className="pointer-events-auto">
+          <SearchBar placeholder="Search tool..." />
         </div>
       </div>
 
-      {/* BOTTOM SHEET - Overlay */}
-      <div className="absolute bottom-0 left-0 right-0 z-30 glass-panel-tall rounded-t-[2rem] pb-8 shadow-glass">
+      {/* BOTTOM SHEET - Device List */}
+      <div className="absolute bottom-0 left-0 right-0 z-30 bg-black/90 backdrop-blur-3xl rounded-t-3xl border-t border-white/10 pb-8 shadow-uber-xl">
         {/* Drag Handle */}
-        <div className="flex justify-center pt-3 pb-4">
-          <div className="w-10 h-1 rounded-full bg-[#FAFAFA]/20" />
+        <div className="flex justify-center pt-3 pb-3">
+          <div className="w-10 h-1 rounded-full bg-white/20" />
         </div>
 
-        <div className="px-6 space-y-6">
-          {/* Header Stats */}
+        <div className="px-4 space-y-4">
+          {/* Header */}
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-headline font-bold text-[#FAFAFA]">
-                Recherche d'outils...
-              </h2>
-              <p className="text-xs text-[#FAFAFA]/70 font-body">
-                {items.length} outil(s) détecté(s)
+              <h2 className="text-base font-bold text-white">Detected Devices</h2>
+              <p className="text-xs text-white/60">
+                {devices.length} device{devices.length !== 1 ? 's' : ''} found
               </p>
             </div>
-            <div className="bg-primary px-3 py-1.5 rounded-lg">
-              <span className="text-xs font-label font-bold text-black uppercase">
-                {items.length} Détectés
-              </span>
-            </div>
+            {selectedDevice && (
+              <div className="bg-[#06C167] px-3 py-1 rounded-lg">
+                <span className="text-xs font-bold text-black">
+                  Tracking: {selectedDevice.name}
+                </span>
+              </div>
+            )}
           </div>
 
-          {/* Horizontal Scroll Cards */}
-          <div className="flex gap-4 overflow-x-auto pb-4 -mx-6 px-6 no-scrollbar">
-            {bleDevices.map((device) => (
-              <div
-                key={device.id}
-                className="min-w-[200px] glass-card p-4 rounded-2xl flex flex-col gap-3"
-              >
-                <div className="flex items-start justify-between">
-                  <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                    <span
-                      className="material-symbols-outlined text-primary"
-                      style={{ fontVariationSettings: '"FILL" 1' }}
-                    >
-                      {device.icon}
-                    </span>
-                  </div>
-                  <div className={`px-2 py-0.5 rounded-full ${getStatusColor(device.status)}`}>
-                    <span className="text-[10px] font-bold uppercase">{getStatusLabel(device.status)}</span>
-                  </div>
-                </div>
-                <div>
-                  <h3 className="text-sm font-bold text-[#FAFAFA] leading-tight">{device.name}</h3>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className="text-xs text-primary font-bold">{device.distance}m</span>
-                    <span className="text-[10px] text-[#FAFAFA]/50">•</span>
-                    <span className="text-[10px] text-[#FAFAFA]/50 font-medium">
-                      {device.rssi} dBm
-                    </span>
-                  </div>
-                </div>
+          {/* Device List */}
+          <div className="space-y-2 max-h-64 overflow-y-auto no-scrollbar">
+            {devices.length === 0 ? (
+              <div className="text-center py-8">
+                <span className="material-symbols-outlined text-4xl text-white/30 mb-2">
+                  bluetooth_disabled
+                </span>
+                <p className="text-sm text-white/50">
+                  {isScanning ? 'Scanning for devices...' : 'Scan paused'}
+                </p>
               </div>
-            ))}
+            ) : (
+              devices.map(device => (
+                <div
+                  key={device.id}
+                  onClick={() => handleDeviceSelect(device.id)}
+                  className={`transition-all ${
+                    selectedDeviceId === device.id
+                      ? 'ring-2 ring-[#06C167] scale-[1.02]'
+                      : 'hover:bg-white/5'
+                  }`}
+                >
+                  <BLEDeviceCard
+                    device={device}
+                    compact={true}
+                  />
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>

@@ -89,3 +89,114 @@ export function getSignalIntensity(rssi: number): number {
   const intensity = ((rssi - min) / (max - min)) * 100;
   return Math.max(0, Math.min(100, intensity));
 }
+
+/**
+ * Hot/Cold Guidance Algorithm
+ * Compares current distance with previous distance to provide directional feedback
+ */
+export interface HotColdGuidance {
+  status: 'HOT' | 'WARM' | 'COLD';
+  direction: string;
+  confidence: number;
+  emoji: string;
+  color: string;
+}
+
+export class HotColdFinder {
+  private previousDistance: number | null = null;
+  private distanceHistory: number[] = [];
+  private readonly HISTORY_SIZE = 5;
+
+  /**
+   * Update with new distance and get hot/cold guidance
+   */
+  update(currentDistance: number): HotColdGuidance {
+    // Add to history
+    this.distanceHistory.push(currentDistance);
+    if (this.distanceHistory.length > this.HISTORY_SIZE) {
+      this.distanceHistory.shift();
+    }
+
+    // Calculate trend (are we getting closer or farther?)
+    let trend = 0;
+    if (this.distanceHistory.length >= 2) {
+      const recent = this.distanceHistory[this.distanceHistory.length - 1];
+      const previous = this.distanceHistory[this.distanceHistory.length - 2];
+      trend = previous - recent; // Positive = getting closer, Negative = getting farther
+    }
+
+    // Determine status based on distance AND trend
+    let status: 'HOT' | 'WARM' | 'COLD';
+    let direction: string;
+    let emoji: string;
+    let color: string;
+
+    if (currentDistance < 2) {
+      status = 'HOT';
+      emoji = '🔥';
+      color = '#06C167';
+      direction = 'You\'re very close!';
+    } else if (currentDistance < 5) {
+      status = 'WARM';
+      emoji = '🌤️';
+      color = '#FFC107';
+      direction = trend > 0.3 ? 'Keep going, getting closer!' : 
+                  trend < -0.3 ? 'You\'re moving away' :
+                  'Search around you';
+    } else {
+      status = 'COLD';
+      emoji = '❄️';
+      color = '#0071EB';
+      direction = trend > 0.5 ? 'Good direction, keep going!' : 
+                  trend < -0.5 ? 'Wrong direction, turn around' :
+                  'Start searching';
+    }
+
+    // Confidence based on history size and consistency
+    const confidence = Math.min(1, this.distanceHistory.length / this.HISTORY_SIZE);
+
+    this.previousDistance = currentDistance;
+
+    return {
+      status,
+      direction,
+      confidence,
+      emoji,
+      color,
+    };
+  }
+
+  /**
+   * Reset the finder
+   */
+  reset() {
+    this.previousDistance = null;
+    this.distanceHistory = [];
+  }
+}
+
+/**
+ * Calculate bearing (direction) between two points in degrees
+ */
+export function calculateBearing(
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number
+): number {
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const y = Math.sin(dLon) * Math.cos(lat2 * Math.PI / 180);
+  const x = Math.cos(lat1 * Math.PI / 180) * Math.sin(lat2 * Math.PI / 180) -
+            Math.sin(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.cos(dLon);
+  const bearing = Math.atan2(y, x) * 180 / Math.PI;
+  return (bearing + 360) % 360;
+}
+
+/**
+ * Convert bearing to cardinal direction
+ */
+export function bearingToCardinal(bearing: number): string {
+  const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+  const index = Math.round(bearing / 45) % 8;
+  return directions[index];
+}
