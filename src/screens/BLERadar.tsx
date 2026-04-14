@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Capacitor } from '@capacitor/core';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import BottomNav from '../components/BottomNav';
@@ -10,6 +11,7 @@ import { BLEDeviceCard, ProximityIndicator, SignalStrengthBar } from '../compone
 import { HotColdFinder, HotColdGuidance } from '../utils/bleFilters';
 
 function BLERadarContent() {
+  const navigate = useNavigate();
   const { addItem, clearItems, items } = useMapContext();
   const { devices, isScanning, startScan, stopScan, error } = useBLEScannerContext();
   
@@ -83,6 +85,13 @@ function BLERadarContent() {
     }
     setSelectedDeviceId(prev => prev === deviceId ? null : deviceId);
   }, []);
+
+  const handleCalibration = useCallback(async () => {
+    if (Capacitor.isNativePlatform()) {
+      await Haptics.impact({ style: ImpactStyle.Light });
+    }
+    navigate('/radar/calibration');
+  }, [navigate]);
 
   return (
     <div className="relative flex h-screen w-full flex-col overflow-hidden bg-black text-white">
@@ -176,13 +185,24 @@ function BLERadarContent() {
                 {devices.length} device{devices.length !== 1 ? 's' : ''} found
               </p>
             </div>
-            {selectedDevice && (
-              <div className="bg-[#06C167] px-3 py-1 rounded-lg">
-                <span className="text-xs font-bold text-black">
-                  Tracking: {selectedDevice.name}
-                </span>
-              </div>
-            )}
+            <div className="flex items-center gap-2">
+              {/* Calibration Button */}
+              <button
+                onClick={handleCalibration}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 rounded-lg hover:bg-white/20 active:scale-95 transition-all"
+              >
+                <span className="material-symbols-outlined text-sm text-[#06C167]">tune</span>
+                <span className="text-xs font-bold text-[#06C167]">Calibrate</span>
+              </button>
+              
+              {selectedDevice && (
+                <div className="bg-[#06C167] px-3 py-1 rounded-lg">
+                  <span className="text-xs font-bold text-black">
+                    Tracking: {selectedDevice.name}
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Device List */}

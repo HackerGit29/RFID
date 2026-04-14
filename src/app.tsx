@@ -4,6 +4,7 @@ import HomeDashboard from './screens/HomeDashboard';
 import InventoryList from './screens/InventoryList';
 import ToolDetail from './screens/ToolDetail';
 import BLERadar from './screens/BLERadar';
+import RSSICalibration from './screens/RSSICalibration';
 
 // Placeholder screens for routes not yet implemented
 function PlaceholderScreen({ name }: { name: string }) {
@@ -30,6 +31,7 @@ export default function App() {
         <Route path="/inventory/:id" element={<ToolDetail />} />
         <Route path="/tool/:id" element={<ToolDetail />} />
         <Route path="/radar" element={<BLERadar />} />
+        <Route path="/radar/calibration" element={<RSSICalibration />} />
         
         {/* Placeholder Screens */}
         <Route path="/alerts" element={<PlaceholderScreen name="Alertes" />} />

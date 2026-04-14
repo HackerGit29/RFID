@@ -65,8 +65,25 @@ export function smoothRSSI(currentRssi: number, previousRssi: number): number {
 
 /**
  * Convert RSSI to distance in meters using the Log-Distance Path Loss Model
+ * Uses calibration data if available from localStorage
  */
 export function rssiToDistance(rssi: number): number {
+  // Try to load calibration data
+  try {
+    const calData = localStorage.getItem('ble_rssi_calibration');
+    if (calData) {
+      const calibration = JSON.parse(calData);
+      const { RSSI_AT_1M, PATH_LOSS_EXPONENT } = {
+        RSSI_AT_1M: calibration.rssiAt1m || -59,
+        PATH_LOSS_EXPONENT: calibration.pathLossExponent || 3.0,
+      };
+      return Math.pow(10, ((RSSI_AT_1M - rssi) / (10 * PATH_LOSS_EXPONENT)));
+    }
+  } catch {
+    // Fall back to defaults if calibration fails
+  }
+  
+  // Default values (no calibration)
   const { RSSI_AT_1M, PATH_LOSS_EXPONENT } = BLE_CONFIG;
   return Math.pow(10, ((RSSI_AT_1M - rssi) / (10 * PATH_LOSS_EXPONENT)));
 }
