@@ -4,7 +4,7 @@
 
 **Version:** 1.0.0  
 **Date:** 17 Avril 2026  
-**Technologie:** React + Vite + Capacitor + TailwindCSS
+
 
 ---
 
@@ -196,7 +196,7 @@ Elements realizables des maintenant (software uniquement):
 
 | Element | Status | Description |
 |---------|--------|--------------|
-| **Application mobile** | ✅ | React + Capacitor |
+| **Application mobile** | ✅ | React  |
 | **Base de données SQLite** | ✅ | CRUD outils |
 | **Backend Supabase** | ⚠️ | Schema prep, en attente config |
 | **Carte Leaflet/OSM** | ✅ | Visualisation |
@@ -276,11 +276,10 @@ RFID/
 
 | Categorie | Technologie |
 |-----------|-------------|
-| **Frontend** | React 18, TypeScript, Vite |
-| **Mobile** | Capacitor 6 |
+| **Frontend** | React |
 | **Styling** | TailwindCSS v4 |
 | **Maps** | Leaflet + OpenStreetMap |
-| **Database** | SQLite (WASM) + Supabase |
+| **Database** | SQLite + Supabase |
 | **State** | React Context API |
 
 ---
@@ -312,7 +311,7 @@ RFID/
 
 - **Issues:** Ouvrir un ticket GitHub
 - **Documentation:** Voir fichiers `docs/`
-- **Expertise:** `mulch prime` (contexte projet)
+
 
 ---
 
