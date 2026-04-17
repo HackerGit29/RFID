@@ -8,7 +8,7 @@ import FilterChips from '../components/FilterChips';
 import ToolCard from '../components/ToolCard';
 import { Tool } from '../types';
 import { useUIFilters } from '../contexts/UIFiltersContext';
-import { getAllTools, initDatabase, generateId, Tool as DBTool } from '../utils/db';
+import { getAllTools, initDatabase, generateId, addTool, Tool as DBTool } from '../utils/db';
 
 const filters = ['Tous', 'RFID', 'BLE', 'RFID+BLE'];
 
@@ -25,6 +25,10 @@ export default function InventoryList() {
   const [tools, setTools] = useState<DBTool[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newToolName, setNewToolName] = useState('');
+  const [newToolCategory, setNewToolCategory] = useState('Électroportatif');
+  const [newToolSerial, setNewToolSerial] = useState('');
 
   // Load data from SQLite
   useEffect(() => {
@@ -97,15 +101,9 @@ export default function InventoryList() {
   return (
     <SwipeGesture onSwipeLeft={handleSwipeBack}>
       <div className="min-h-screen pb-32" style={{ background: 'linear-gradient(180deg, #121212 0%, #0a0a0a 100%)' }}>
-        <div className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl" style={{ background: 'rgba(18, 18, 18, 0.85)', borderBottom: '1px solid rgba(255, 255, 255, 0.06)' }}>
-          <TopBar
-            title="Inventaire"
-            showSettings
-            showThemeToggle
-          />
-        </div>
+        <div className="h-2"></div>
 
-        <main className="pt-32 pb-32 px-6 max-w-2xl mx-auto">
+        <main className="pb-32 px-6 max-w-2xl mx-auto">
           {/* Header */}
           <section className="mb-8">
             <h2 className="font-headline text-4xl font-extrabold tracking-tight" style={{ color: '#FAFAFA' }}>
@@ -170,7 +168,7 @@ export default function InventoryList() {
           </section>
         </main>
 
-        {/* FAB - Minimal design (no glow) */}
+        {/* FAB - Minimal design - Ouvre Add Modal */}
         <button 
           className="fixed right-6 bottom-28 w-14 h-14 flex items-center justify-center text-white active:scale-90 transition-transform z-40"
           style={{ 
@@ -179,9 +177,93 @@ export default function InventoryList() {
             border: '1px solid #333',
           }}
           aria-label="Ajouter un outil"
+          onClick={() => setShowAddModal(true)}
         >
           <span className="material-symbols-outlined text-3xl">add</span>
         </button>
+
+        {/* Add Tool Modal */}
+        {showAddModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/80" onClick={() => setShowAddModal(false)}></div>
+            <div className="relative w-full max-w-md p-6 rounded-2xl" style={{ background: '#1a1a1a', border: '1px solid #333' }}>
+              <h2 className="text-xl font-bold text-white mb-4">Ajouter un outil</h2>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-xs text-white/60 mb-1">Nom</label>
+                  <input
+                    type="text"
+                    value={newToolName}
+                    onChange={(e) => setNewToolName(e.target.value)}
+                    className="w-full p-3 rounded-lg bg-[#121212] border border-white/10 text-white"
+                    placeholder="Nom de l'outil..."
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-xs text-white/60 mb-1">Catégorie</label>
+                  <select
+                    value={newToolCategory}
+                    onChange={(e) => setNewToolCategory(e.target.value)}
+                    className="w-full p-3 rounded-lg bg-[#121212] border border-white/10 text-white"
+                  >
+                    <option value="Électroportatif">Électroportatif</option>
+                    <option value="Mesure & Traçage">Mesure & Traçage</option>
+                    <option value="Maintenance">Maintenance</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-xs text-white/60 mb-1">Numéro de série</label>
+                  <input
+                    type="text"
+                    value={newToolSerial}
+                    onChange={(e) => setNewToolSerial(e.target.value)}
+                    className="w-full p-3 rounded-lg bg-[#121212] border border-white/10 text-white"
+                    placeholder="SN-XXXXX"
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={() => setShowAddModal(false)}
+                  className="flex-1 py-3 rounded-lg bg-[#121212] text-white border border-white/10"
+                >
+                  Annuler
+                </button>
+                <button
+                  onClick={async () => {
+                    if (!newToolName.trim()) return;
+                    try {
+                      await addTool({
+                        id: generateId(),
+                        name: newToolName,
+                        category: newToolCategory,
+                        serial_number: newToolSerial,
+                        rfid_enabled: 0,
+                        ble_enabled: 0,
+                        status: 'available',
+                        price: 0,
+                      });
+                      const data = await getAllTools();
+                      setTools(data);
+                      setShowAddModal(false);
+                      setNewToolName('');
+                      setNewToolSerial('');
+                    } catch (err) {
+                      console.error('Add failed:', err);
+                    }
+                  }}
+                  className="flex-1 py-3 rounded-lg bg-[#06C167] text-white font-bold"
+                >
+                  Ajouter
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Bottom Navigation */}
         <BottomNav activeTab="inventory" />

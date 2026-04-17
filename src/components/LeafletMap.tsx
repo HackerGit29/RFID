@@ -174,13 +174,13 @@ export default function LeafletMap({
   } = useMapContext();
   
   return (
-    <div className={`relative ${className}`}>
+    <div className={`relative ${className}`} style={{ height: '100%', width: '100%', minHeight: '300px' }}>
       <MapContainer
         center={center}
         zoom={zoom}
         zoomControl={false}
         className="h-full w-full rounded-lg"
-        style={{ background: resolvedTheme === 'dark' ? '#000000' : '#f8f9ff' }}
+        style={{ background: resolvedTheme === 'dark' ? '#000000' : '#f8f9ff', height: '100%', width: '100%' }}
       >
         {/* User Location */}
         {showUserLocation && (

@@ -3,7 +3,7 @@ import { Capacitor } from '@capacitor/core';
 import { Haptics } from '@capacitor/haptics';
 
 interface BottomNavProps {
-  activeTab: 'home' | 'inventory' | 'radar' | 'alerts' | 'profile';
+  activeTab: 'home' | 'inventory' | 'radar' | 'alerts';
 }
 
 export default function BottomNav({ activeTab }: BottomNavProps) {
@@ -20,7 +20,6 @@ export default function BottomNav({ activeTab }: BottomNavProps) {
     { id: 'inventory' as const, icon: 'inventory_2', label: 'Inventaire', path: '/inventory' },
     { id: 'radar' as const, icon: 'radar', label: 'Radar', path: '/radar' },
     { id: 'alerts' as const, icon: 'notifications_active', label: 'Alertes', path: '/alerts' },
-    { id: 'profile' as const, icon: 'person', label: 'Profil', path: '/profile' },
   ];
 
   return (

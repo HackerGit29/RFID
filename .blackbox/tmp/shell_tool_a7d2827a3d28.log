@@ -1,0 +1,11 @@
+
+> capacitor-app@1.0.0 start
+> vite --host
+
+Port 5173 is in use, trying another one...
+
+  VITE v8.0.3  ready in 230 ms
+
+  ➜  Local:   http://localhost:5174/
+  ➜  Network: http://192.168.1.153:5174/
+  ➜  Network: http://172.20.0.1:5174/

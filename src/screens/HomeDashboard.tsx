@@ -17,16 +17,9 @@ export default function HomeDashboard() {
 
   return (
     <div className="min-h-screen pb-32" style={{ background: 'linear-gradient(180deg, #121212 0%, #0a0a0a 100%)' }}>
-      <div className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl" style={{ background: 'rgba(18, 18, 18, 0.85)', borderBottom: '1px solid rgba(255, 255, 255, 0.06)' }}>
-        <TopBar
-          title=""
-          showNotifications
-          notificationCount={movements.filter(m => !m.authorized).length}
-          showThemeToggle
-        />
-      </div>
+      <div className="h-2"></div>
 
-      <main className="mt-32 px-6 space-y-8">
+      <main className="px-6 space-y-8">
         {/* Critical Alert Banner - Glassmorphism */}
         {lastAlert && (
           <div className="p-4 rounded-2xl flex items-center gap-3 animate-pulse" style={{ 
@@ -84,20 +77,25 @@ export default function HomeDashboard() {
           </section>
         </div>
 
-        {/* Map Preview - Uber Style */}
-        <section className="h-48 rounded-2xl overflow-hidden relative mt-8" style={{ boxShadow: '0 8px 32px rgba(0,0,0,0.4)' }}>
-          <img
-            alt="Map location preview"
-            className="w-full h-full object-cover"
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAyih90kcRyhB0XGfAoEL5ISNEfUEAXD6UwcdCL1YJ6sTPdu4SiJa8_7GsYqDOTCmQROYKrZ0EWgdJMTV0RliLgyJbPsnrTONe2XvxoKmU9_1fKXm4BexJRGb7yMKX3FQOrYzX5vdjMaxs2aoc7GNS1p93ThwuNtOU3_b4pyHT-3ivXulZCsbU9vIqgYVmvZ6F0rHxgLp3h-Ykm8FIqP2ks49C3sZPZlTp07mA11XYALTnpjP2TY4CfR3DVYFw-27K1Q9fi-6VtfNn"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-60"></div>
-          <div className="absolute bottom-4 left-4 flex items-center gap-2 px-3 py-2 rounded-full" style={{ background: '#121212', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }}>
-            <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: '#06C167' }}></span>
-            <span className="text-xs font-bold uppercase tracking-widest" style={{ color: '#ffffff' }}>
-              Radar Actif : {movements.length} Signaux
-            </span>
-          </div>
+        {/* Map Preview - Sans signaux */}
+        <section className="h-48 rounded-2xl overflow-hidden relative mt-8 flex items-center justify-center" style={{ background: '#0a0a0a', boxShadow: '0 8px 32px rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.06)' }}>
+          {movements.length > 0 ? (
+            <>
+              <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-60 z-10"></div>
+              <div className="absolute bottom-4 left-4 flex items-center gap-2 px-3 py-2 rounded-full z-20" style={{ background: '#121212', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }}>
+                <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: '#06C167' }}></span>
+                <span className="text-xs font-bold uppercase tracking-widest" style={{ color: '#ffffff' }}>
+                  Radar Actif : {movements.length} Signaux
+                </span>
+              </div>
+            </>
+          ) : (
+            <div className="text-center p-4">
+              <span className="material-symbols-outlined text-4xl" style={{ color: '#333' }}>radar</span>
+              <p className="mt-2 text-sm" style={{ color: '#666' }}>Aucun signal détecté</p>
+              <p className="text-xs mt-1" style={{ color: '#444' }}>Activez le radar pour commencer</p>
+            </div>
+          )}
         </section>
       </main>
 

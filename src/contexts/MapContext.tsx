@@ -92,7 +92,7 @@ export function MapProvider({ children }: { children: ReactNode }) {
   const [layers, setLayers] = useState<MapLayer[]>([
     { id: 'items', name: 'Outils', visible: true, type: 'items' },
     { id: 'routes', name: 'Itinéraires', visible: true, type: 'routes' },
-    { id: 'heatmap', name: 'Heatmap', visible: false, type: 'heatmap' },
+    { id: 'heatmap', name: 'Chaleur', visible: true, type: 'heatmap' },
     { id: 'zones', name: 'Zones', visible: true, type: 'zones' },
   ]);
   

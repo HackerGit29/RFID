@@ -1,9 +1,10 @@
 /**
- * SQLite Database Wrapper (sql.js WASM)
- * Lightweight, zero-dependency SQLite pour Android WebView
+ * IndexedDB Database Wrapper
+ * Native, zero-dependency storage pour Capacitor/WebView
  */
 
-import initSqlJs, { Database, SqlJsStatic } from 'sql.js';
+const DB_NAME = 'ToolTracker';
+const DB_VERSION = 1;
 
 export interface Tool {
   id: string;
@@ -19,7 +20,7 @@ export interface Tool {
 }
 
 export interface Detection {
-  id: number;
+  id?: number;
   tool_id: string;
   lat: number;
   lng: number;
@@ -28,7 +29,7 @@ export interface Detection {
 }
 
 export interface Movement {
-  id: number;
+  id?: number;
   tool_id: string;
   type: 'check_in' | 'check_out';
   user_id: string;
@@ -36,182 +37,195 @@ export interface Movement {
   timestamp: string;
 }
 
-// Lazy-load SQLite WASM
-let SQL: SqlJsStatic | null = null;
-let db: Database | null = null;
+let db: IDBDatabase | null = null;
 
 /**
- * Initialize database - charge WASM et crée les tables
+ * Open IndexedDB connection
  */
-export async function initDatabase(): Promise<void> {
-  if (db) return;
-
-  try {
-    // Charge sql.js WASM
-    SQL = await initSqlJs({
-      locateFile: (file: string) => `https://sql.js.org/dist/${file}`,
-    });
-
-    // Ouvre ou crée la base
-    const saved = localStorage.getItem('tooltracker_db');
-    if (saved) {
-      const data = Uint8Array.from(atob(saved), c => c.charCodeAt(0));
-      db = new SQL.Database(data);
-    } else {
-      db = new SQL.Database();
+function openDB(): Promise<IDBDatabase> {
+  return new Promise((resolve, reject) => {
+    if (db) {
+      resolve(db);
+      return;
     }
 
-    // Crée les tables si她们 n'existent pas
-    db.run(`
-      CREATE TABLE IF NOT EXISTS tools (
-        id TEXT PRIMARY KEY,
-        name TEXT NOT NULL,
-        category TEXT DEFAULT '',
-        serial_number TEXT UNIQUE,
-        rfid_enabled INTEGER DEFAULT 0,
-        ble_enabled INTEGER DEFAULT 0,
-        status TEXT DEFAULT 'available',
-        price REAL DEFAULT 0,
-        created_at TEXT DEFAULT (datetime('now')),
-        updated_at TEXT DEFAULT (datetime('now'))
-      )
-    `);
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
 
-    db.run(`
-      CREATE TABLE IF NOT EXISTS detections (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        tool_id TEXT REFERENCES tools(id),
-        lat REAL,
-        lng REAL,
-        rssi INTEGER,
-        detected_at TEXT DEFAULT (datetime('now'))
-      )
-    `);
+    request.onerror = () => reject(request.error);
 
-    db.run(`
-      CREATE TABLE IF NOT EXISTS movements (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        tool_id TEXT REFERENCES tools(id),
-        type TEXT CHECK(type IN ('check_in','check_out')),
-        user_id TEXT,
-        location TEXT,
-        timestamp TEXT DEFAULT (datetime('now'))
-      )
-    `);
+    request.onsuccess = () => {
+      db = request.result;
+      resolve(db);
+    };
 
-    saveDatabase();
-  } catch (err) {
-    console.error('[DB] Init failed:', err);
-    throw err;
-  }
-}
+    request.onupgradeneeded = (event) => {
+      const database = (event.target as IDBOpenDBRequest).result;
 
-/**
- * Sauvegarde la base dans localStorage
- */
-function saveDatabase(): void {
-  if (!db) return;
-  const data = db.export();
-  const base64 = btoa(String.fromCharCode(...data));
-  localStorage.setItem('tooltracker_db', base64);
-}
+      // Tools store
+      if (!database.objectStoreNames.contains('tools')) {
+        const toolStore = database.createObjectStore('tools', { keyPath: 'id' });
+        toolStore.createIndex('name', 'name', { unique: false });
+        toolStore.createIndex('category', 'category', { unique: false });
+        toolStore.createIndex('serial_number', 'serial_number', { unique: false });
+      }
 
-/**
- * Récupère tous les outils
- */
-export async function getAllTools(): Promise<Tool[]> {
-  await initDatabase();
-  const result = db!.exec('SELECT * FROM tools ORDER BY name');
-  if (!result.length) return [];
+      // Detections store
+      if (!database.objectStoreNames.contains('detections')) {
+        const detectionStore = database.createObjectStore('detections', { keyPath: 'id', autoIncrement: true });
+        detectionStore.createIndex('tool_id', 'tool_id', { unique: false });
+      }
 
-  const cols = result[0].columns;
-  return result[0].values.map(row => {
-    const tool: Record<string, unknown> = {};
-    cols.forEach((col, i) => tool[col] = row[i]);
-    return tool as unknown as Tool;
+      // Movements store
+      if (!database.objectStoreNames.contains('movements')) {
+        const movementStore = database.createObjectStore('movements', { keyPath: 'id', autoIncrement: true });
+        movementStore.createIndex('tool_id', 'tool_id', { unique: false });
+        movementStore.createIndex('timestamp', 'timestamp', { unique: false });
+      }
+    };
   });
 }
 
 /**
- * Récupère un outil par ID
+ * Get all tools
+ */
+export async function getAllTools(): Promise<Tool[]> {
+  const database = await openDB();
+  return new Promise((resolve, reject) => {
+    const transaction = database.transaction('tools', 'readonly');
+    const store = transaction.objectStore('tools');
+    const request = store.getAll();
+
+    request.onsuccess = () => resolve(request.result || []);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+/**
+ * Get tool by ID
  */
 export async function getToolById(id: string): Promise<Tool | null> {
-  await initDatabase();
-  const stmt = db!.prepare('SELECT * FROM tools WHERE id = ?');
-  stmt.bind([id]);
-  if (!stmt.step()) return null;
+  const database = await openDB();
+  return new Promise((resolve, reject) => {
+    const transaction = database.transaction('tools', 'readonly');
+    const store = transaction.objectStore('tools');
+    const request = store.get(id);
 
-  const row = stmt.getAsObject();
-  stmt.free();
-  return row as unknown as Tool;
+    request.onsuccess = () => resolve(request.result || null);
+    request.onerror = () => reject(request.error);
+  });
 }
 
 /**
- * Ajoute un nouvel outil
+ * Add new tool
  */
 export async function addTool(tool: Omit<Tool, 'created_at' | 'updated_at'>): Promise<void> {
-  await initDatabase();
-  db!.run(
-    `INSERT INTO tools (id, name, category, serial_number, rfid_enabled, ble_enabled, status, price)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-    [tool.id, tool.name, tool.category, tool.serial_number, tool.rfid_enabled, tool.ble_enabled, tool.status, tool.price]
-  );
-  saveDatabase();
+  const database = await openDB();
+  const now = new Date().toISOString();
+  const newTool: Tool = {
+    ...tool,
+    created_at: now,
+    updated_at: now,
+  };
+
+  return new Promise((resolve, reject) => {
+    const transaction = database.transaction('tools', 'readwrite');
+    const store = transaction.objectStore('tools');
+    const request = store.add(newTool);
+
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject(request.error);
+  });
 }
 
 /**
- * Met à jour un outil
+ * Update tool
  */
 export async function updateTool(id: string, data: Partial<Tool>): Promise<void> {
-  await initDatabase();
-  const fields = Object.keys(data).map(k => `${k} = ?`).join(', ');
-  const values = Object.values(data);
-  db!.run(`UPDATE tools SET ${fields}, updated_at = datetime('now') WHERE id = ?`, [...values, id]);
-  saveDatabase();
+  const database = await openDB();
+  const tool = await getToolById(id);
+
+  if (!tool) {
+    throw new Error(`Tool ${id} not found`);
+  }
+
+  const updatedTool: Tool = {
+    ...tool,
+    ...data,
+    updated_at: new Date().toISOString(),
+  };
+
+  return new Promise((resolve, reject) => {
+    const transaction = database.transaction('tools', 'readwrite');
+    const store = transaction.objectStore('tools');
+    const request = store.put(updatedTool);
+
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject(request.error);
+  });
 }
 
 /**
- * Supprime un outil
+ * Delete tool
  */
 export async function deleteTool(id: string): Promise<void> {
-  await initDatabase();
-  db!.run('DELETE FROM tools WHERE id = ?', [id]);
-  db!.run('DELETE FROM detections WHERE tool_id = ?', [id]);
-  db!.run('DELETE FROM movements WHERE tool_id = ?', [id]);
-  saveDatabase();
+  const database = await openDB();
+
+  return new Promise((resolve, reject) => {
+    const transaction = database.transaction(['tools', 'detections', 'movements'], 'readwrite');
+    
+    transaction.objectStore('tools').delete(id);
+    transaction.objectStore('detections').delete(id);
+    transaction.objectStore('movements').delete(id);
+
+    transaction.oncomplete = () => resolve();
+    transaction.onerror = () => reject(transaction.error);
+  });
 }
 
 /**
- * Ajoute une détection de position
+ * Add detection
  */
 export async function addDetection(toolId: string, lat: number, lng: number, rssi: number): Promise<void> {
-  await initDatabase();
-  db!.run(
-    'INSERT INTO detections (tool_id, lat, lng, rssi) VALUES (?, ?, ?, ?)',
-    [toolId, lat, lng, rssi]
-  );
-  saveDatabase();
+  const database = await openDB();
+  const detection: Detection = {
+    tool_id: toolId,
+    lat,
+    lng,
+    rssi,
+    detected_at: new Date().toISOString(),
+  };
+
+  return new Promise((resolve, reject) => {
+    const transaction = database.transaction('detections', 'readwrite');
+    const store = transaction.objectStore('detections');
+    const request = store.add(detection);
+
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject(request.error);
+  });
 }
 
 /**
- * Récupère l'historique de détection
+ * Get detections for tool
  */
 export async function getDetections(toolId: string, limit = 100): Promise<Detection[]> {
-  await initDatabase();
-  const sql = `SELECT * FROM detections WHERE tool_id = ? ORDER BY detected_at DESC LIMIT ?`;
-  const stmt = db!.prepare(sql);
-  stmt.bind([toolId, limit]);
+  const database = await openDB();
+  return new Promise((resolve, reject) => {
+    const transaction = database.transaction('detections', 'readonly');
+    const store = transaction.objectStore('detections');
+    const index = store.index('tool_id');
+    const request = index.getAll(toolId);
 
-  const detections: Detection[] = [];
-  while (stmt.step()) {
-    detections.push(stmt.getAsObject() as unknown as Detection);
-  }
-  stmt.free();
-  return detections;
+    request.onsuccess = () => {
+      const results = request.result || [];
+      resolve(results.slice(-limit));
+    };
+    request.onerror = () => reject(request.error);
+  });
 }
 
 /**
- * Ajoute un mouvement (check-in/check-out)
+ * Add movement
  */
 export async function addMovement(
   toolId: string,
@@ -219,34 +233,56 @@ export async function addMovement(
   userId: string,
   location: string
 ): Promise<void> {
-  await initDatabase();
-  db!.run(
-    'INSERT INTO movements (tool_id, type, user_id, location) VALUES (?, ?, ?, ?)',
-    [toolId, type, userId, location]
-  );
-  saveDatabase();
+  const database = await openDB();
+  const movement: Movement = {
+    tool_id: toolId,
+    type,
+    user_id: userId,
+    location,
+    timestamp: new Date().toISOString(),
+  };
+
+  return new Promise((resolve, reject) => {
+    const transaction = database.transaction('movements', 'readwrite');
+    const store = transaction.objectStore('movements');
+    const request = store.add(movement);
+
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject(request.error);
+  });
 }
 
 /**
- * Récupère les mouvements d'un outil
+ * Get movements for tool
  */
 export async function getMovements(toolId: string, limit = 50): Promise<Movement[]> {
-  await initDatabase();
-  const sql = `SELECT * FROM movements WHERE tool_id = ? ORDER BY timestamp DESC LIMIT ?`;
-  const stmt = db!.prepare(sql);
-  stmt.bind([toolId, limit]);
+  const database = await openDB();
+  return new Promise((resolve, reject) => {
+    const transaction = database.transaction('movements', 'readonly');
+    const store = transaction.objectStore('movements');
+    const index = store.index('tool_id');
+    const request = index.getAll(toolId);
 
-  const movements: Movement[] = [];
-  while (stmt.step()) {
-    movements.push(stmt.getAsObject() as unknown as Movement);
-  }
-  stmt.free();
-  return movements;
+    request.onsuccess = () => {
+      const results = request.result || [];
+      // Sort by timestamp desc
+      results.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+      resolve(results.slice(0, limit));
+    };
+    request.onerror = () => reject(request.error);
+  });
 }
 
 /**
- * Génère un ID unique
+ * Generate unique ID
  */
 export function generateId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+}
+
+/**
+ * Init database (no-op for IndexedDB)
+ */
+export async function initDatabase(): Promise<void> {
+  await openDB();
 }
