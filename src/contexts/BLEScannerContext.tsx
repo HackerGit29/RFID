@@ -1,7 +1,14 @@
 import { createContext, useContext, useState, useCallback, useRef, useEffect, ReactNode } from 'react';
 import { BLEDevice } from '../types';
 import { smoothRSSI, rssiToDistance, getSignalStatus, KalmanFilter, BLE_CONFIG } from '../utils/bleFilters';
-import { getBLETools } from '../utils/db';
+import { getBLETools, getToolByBLEUUID } from '../utils/db';
+
+export interface BLEDiscoveredDevice {
+  uuid: string;
+  rssi: number;
+  name?: string;
+  firstSeen: number;
+}
 
 interface BLEScannerContextType {
   devices: BLEDevice[];
@@ -9,6 +16,8 @@ interface BLEScannerContextType {
   startScan: () => void;
   stopScan: () => void;
   error: string | null;
+  unknownDevices: BLEDiscoveredDevice[];
+  clearUnknownDevice: (uuid: string) => void;
 }
 
 const BLEScannerContext = createContext<BLEScannerContextType | undefined>(undefined);
@@ -17,25 +26,59 @@ export function BLEScannerProvider({ children }: { children: ReactNode }) {
   const [devices, setDevices] = useState<Map<string, BLEDevice>>(new Map());
   const [isScanning, setIsScanning] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [unknownDevices, setUnknownDevices] = useState<BLEDiscoveredDevice[]>([]);
 
   const filters = useRef<Map<string, KalmanFilter>>(new Map());
 
-  const handleDeviceDetected = useCallback((id: string, name: string, rssi: number, icon: string) => {
+  // Clear unknown device after user adds it to inventory
+  const clearUnknownDevice = useCallback((uuid: string) => {
+    setUnknownDevices(prev => prev.filter(d => d.uuid !== uuid));
+  }, []);
+
+  // handleDeviceDetected: id (or UUID), name, rssi, icon, optional UUID for matching
+  const handleDeviceDetected = useCallback(async (id: string, name: string, rssi: number, icon: string, uuid?: string) => {
+    // Use UUID for matching if provided, otherwise use id
+    const matchId = uuid || id;
+    
+    // Check if device is known in database
+    const knownTool = uuid ? await getToolByBLEUUID(uuid) : null;
+    
+    // Auto-discovery: track unknown devices
+    if (uuid && !knownTool) {
+      setUnknownDevices(prev => {
+        const exists = prev.find(d => d.uuid.toUpperCase() === uuid.toUpperCase());
+        if (exists) {
+          // Update RSSI
+          return prev.map(d => 
+            d.uuid.toUpperCase() === uuid.toUpperCase() 
+              ? { ...d, rssi } 
+              : d
+          );
+        }
+        // Add new unknown device
+        return [...prev, { uuid, rssi, name, firstSeen: Date.now() }];
+      });
+    }
+    
     setDevices(prev => {
       const newMap = new Map(prev);
-      const existing = newMap.get(id);
+      const existing = newMap.get(matchId);
 
-      if (!filters.current.has(id)) {
-        filters.current.set(id, new KalmanFilter(rssi));
+      // Use matchId for filter key to ensure consistency
+      if (!filters.current.has(matchId)) {
+        filters.current.set(matchId, new KalmanFilter(rssi));
       }
-      const filter = filters.current.get(id)!;
+      const filter = filters.current.get(matchId)!;
       const smoothed = filter.update(rssi);
 
       const distance = rssiToDistance(smoothed);
 
-      newMap.set(id, {
-        id,
-        name,
+      // Use known tool name if found, otherwise use provided name
+      const displayName = knownTool?.name || name || `Beacon ${matchId.slice(0, 8)}`;
+
+      newMap.set(matchId, {
+        id: matchId,  // Store matchId as device id (UUID in real mode)
+        name: displayName,
         rssi,
         smoothedRssi: smoothed,
         distance,
@@ -48,11 +91,13 @@ export function BLEScannerProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  // Heartbeat to mark devices as 'lost'
+  // Heartbeat to mark devices as 'lost' and clean up unknown devices
   useEffect(() => {
     const heartbeatInterval = setInterval(() => {
+      const now = Date.now();
+      
+      // Update known devices
       setDevices(prev => {
-        const now = Date.now();
         let changed = false;
         const newMap = new Map(prev);
 
@@ -64,12 +109,16 @@ export function BLEScannerProvider({ children }: { children: ReactNode }) {
         }
         return changed ? newMap : prev;
       });
+
+      // Remove unknown devices not seen in 5 minutes
+      setUnknownDevices(prev => prev.filter(d => now - d.firstSeen < 300000));
     }, 10000);
 
     return () => clearInterval(heartbeatInterval);
   }, []);
 
   // Real scanner from IndexedDB tools (BLE enabled)
+  // Uses ble_uuid for matching, falls back to tool.id for mock
   useEffect(() => {
     if (!isScanning) return;
 
@@ -78,12 +127,16 @@ export function BLEScannerProvider({ children }: { children: ReactNode }) {
         const bleTools = await getBLETools();
         
         const interval = setInterval(() => {
-          // Simulate RSSI for each BLE-enabled tool
           bleTools.forEach(tool => {
+            // Use UUID if available, otherwise fallback to id (mock mode)
+            const deviceId = tool.ble_uuid || `MOCK_${tool.id}`;
+            
             // Random RSSI simulation (-60 to -90 dBm)
             const rssi = -60 - Math.random() * 30;
             const icon = 'handyman';
-            handleDeviceDetected(tool.id, tool.name, rssi, icon);
+            
+            // Pass UUID for real matching, name for display
+            handleDeviceDetected(deviceId, tool.name, rssi, icon, tool.ble_uuid);
           });
         }, 1000);
 
@@ -111,6 +164,8 @@ export function BLEScannerProvider({ children }: { children: ReactNode }) {
     startScan,
     stopScan,
     error,
+    unknownDevices,
+    clearUnknownDevice,
   };
 
   return (

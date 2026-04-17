@@ -30,6 +30,7 @@ export default function InventoryList() {
   const [newToolCategory, setNewToolCategory] = useState('Électroportatif');
   const [newToolSerial, setNewToolSerial] = useState('');
   const [newToolBLE, setNewToolBLE] = useState(false);
+  const [newToolBLEUUID, setNewToolBLEUUID] = useState('');
 
   // Load data from SQLite
   useEffect(() => {
@@ -46,6 +47,21 @@ export default function InventoryList() {
       }
     }
     loadTools();
+  }, []);
+
+  // Handle URL params for auto-add from radar (unknown device discovery)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('add') === 'true') {
+      const uuid = params.get('uuid');
+      if (uuid) {
+        setNewToolBLE(true);
+        setNewToolBLEUUID(uuid);
+        setShowAddModal(true);
+        // Clean URL
+        window.history.replaceState({}, '', '/inventory');
+      }
+    }
   }, []);
 
   const handleSwipeBack = useCallback(() => {
@@ -239,6 +255,21 @@ export default function InventoryList() {
                     <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${newToolBLE ? 'right-1' : 'left-1'}`} />
                   </button>
                 </div>
+
+                {/* BLE UUID (shown when BLE enabled) */}
+                {newToolBLE && (
+                  <div className="mt-3">
+                    <label className="block text-xs text-white/60 mb-1">UUID du tag BLE</label>
+                    <input
+                      type="text"
+                      value={newToolBLEUUID}
+                      onChange={(e) => setNewToolBLEUUID(e.target.value.toUpperCase())}
+                      className="w-full p-3 rounded-lg bg-[#121212] border border-white/10 text-white font-mono text-sm"
+                      placeholder="AA:BB:CC:DD:EE:FF"
+                    />
+                    <p className="text-xs text-white/40 mt-1">UUID du beacon ESP32 ou iBeacon</p>
+                  </div>
+                )}
               </div>
 
               <div className="flex gap-3 mt-6">
@@ -259,6 +290,7 @@ export default function InventoryList() {
                         serial_number: newToolSerial,
                         rfid_enabled: 0,
                         ble_enabled: newToolBLE ? 1 : 0,
+                        ble_uuid: newToolBLE ? newToolBLEUUID : undefined,
                         status: 'available',
                         price: 0,
                       });
@@ -268,6 +300,7 @@ export default function InventoryList() {
                       setNewToolName('');
                       setNewToolSerial('');
                       setNewToolBLE(false);
+                      setNewToolBLEUUID('');
                     } catch (err) {
                       console.error('Add failed:', err);
                     }

@@ -9,7 +9,7 @@ import { HotColdFinder, HotColdGuidance } from '../utils/bleFilters';
 
 export default function BLERadar() {
   const { addItem, clearItems, layers } = useMapContext();
-  const { devices, isScanning, startScan, stopScan } = useBLEScannerContext();
+  const { devices, isScanning, startScan, stopScan, unknownDevices, clearUnknownDevice } = useBLEScannerContext();
 
   const [selectedDeviceId, setSelectedDeviceId] = useState<string | null>(null);
   const [hotColdGuidance, setHotColdGuidance] = useState<HotColdGuidance | null>(null);
@@ -106,6 +106,42 @@ export default function BLERadar() {
       {/* SCROLLABLE DEVICE LIST */}
       <div className="w-full overflow-y-auto" style={{ height: '40%', maxHeight: '250px' }}>
         <div className="px-4 py-3 space-y-2">
+          
+          {/* UNKNOWN DEVICES - Auto-discovery */}
+          {unknownDevices.length > 0 && (
+            <div className="mb-4">
+              <h3 className="text-xs font-bold text-white/40 uppercase tracking-wider mb-2">
+                🔴 Nouveaux appareils détectés
+              </h3>
+              <div className="space-y-2">
+                {unknownDevices.map(device => (
+                  <div
+                    key={device.uuid}
+                    className="p-3 rounded-xl"
+                    style={{ background: 'rgba(255, 100, 100, 0.1)', border: '1px solid rgba(255,100,100,0.3)' }}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm text-white font-medium">Nouveau beacon</p>
+                        <p className="text-xs text-white/50 font-mono">{device.uuid}</p>
+                        <p className="text-xs text-white/40">RSSI: {device.rssi} dBm</p>
+                      </div>
+                      <button
+                        onClick={() => {
+                          // Navigate to inventory with pre-filled UUID
+                          window.location.href = `/inventory?add=true&uuid=${encodeURIComponent(device.uuid)}`;
+                        }}
+                        className="px-3 py-2 rounded-lg bg-[#06C167] text-white text-sm font-bold"
+                      >
+                        + Ajouter
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {devices.length === 0 ? (
             <div className="text-center py-8">
               <span className="material-symbols-outlined text-4xl text-white/20">bluetooth_disabled</span>

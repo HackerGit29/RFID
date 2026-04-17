@@ -13,6 +13,7 @@ export interface Tool {
   serial_number: string;
   rfid_enabled: number;
   ble_enabled: number;
+  ble_uuid?: string;  // UUID du tag BLE (mac address ou iBeacon UUID)
   status: string;
   price: number;
   created_at: string;
@@ -106,6 +107,14 @@ export async function getAllTools(): Promise<Tool[]> {
 export async function getBLETools(): Promise<Tool[]> {
   const tools = await getAllTools();
   return tools.filter(t => t.ble_enabled === 1);
+}
+
+/**
+ * Find tool by BLE UUID (for matching detected beacons)
+ */
+export async function getToolByBLEUUID(uuid: string): Promise<Tool | null> {
+  const tools = await getAllTools();
+  return tools.find(t => t.ble_uuid && t.ble_uuid.toUpperCase() === uuid.toUpperCase()) || null;
 }
 
 /**
