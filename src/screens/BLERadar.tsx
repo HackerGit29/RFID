@@ -7,7 +7,7 @@ import SearchBar from '../components/SearchBar';
 import LeafletMap from '../components/LeafletMap';
 import { useMapContext } from '../contexts/MapContext';
 import { useBLEScannerContext } from '../contexts/BLEScannerContext';
-import { BLEDeviceCard, ProximityIndicator, SignalStrengthBar } from '../components/BLE';
+import { BLEDeviceCard, ProximityIndicator, SignalStrengthBar, HeatmapLayer } from '../components/BLE';
 import { HotColdFinder, HotColdGuidance } from '../utils/bleFilters';
 
 function BLERadarContent() {
@@ -17,6 +17,7 @@ function BLERadarContent() {
   
   const [selectedDeviceId, setSelectedDeviceId] = useState<string | null>(null);
   const [hotColdGuidance, setHotColdGuidance] = useState<HotColdGuidance | null>(null);
+  const [showHeatmap, setShowHeatmap] = useState(true);
   
   const hotColdFinder = useMemo(() => new HotColdFinder(), []);
   
@@ -93,11 +94,23 @@ function BLERadarContent() {
     navigate('/radar/calibration');
   }, [navigate]);
 
+  const handleHeatmapToggle = useCallback(async () => {
+    if (Capacitor.isNativePlatform()) {
+      await Haptics.impact({ style: ImpactStyle.Light });
+    }
+    setShowHeatmap(prev => !prev);
+  }, []);
+
   return (
     <div className="relative flex h-screen w-full flex-col overflow-hidden bg-black text-white">
       {/* MAP LAYER - Full Screen */}
       <div className="absolute inset-0">
         <LeafletMap className="h-full w-full" showControls={true} />
+        <HeatmapLayer
+          devices={devices}
+          visible={showHeatmap}
+          labCenter={[48.8566, 2.3522]}
+        />
       </div>
 
       {/* TOP HUD - Overlay */}
@@ -163,9 +176,21 @@ function BLERadarContent() {
           </div>
         )}
 
-        {/* Search Bar */}
-        <div className="pointer-events-auto">
+        {/* Search Bar & Heatmap Toggle */}
+        <div className="flex gap-2 pointer-events-auto">
           <SearchBar placeholder="Search tool..." />
+          <button
+            onClick={handleHeatmapToggle}
+            className={`flex items-center gap-1.5 px-3 rounded-xl border transition-all active:scale-95 ${
+              showHeatmap
+                ? 'bg-[#06C167]/20 border-[#06C167]/40 text-[#06C167]'
+                : 'bg-white/5 border-white/10 text-white/40'
+            }`}
+          >
+            <span className="material-symbols-outlined text-sm">
+              {showHeatmap ? 'heatmap' : 'heatmap_off'}
+            </span>
+          </button>
         </div>
       </div>
 
