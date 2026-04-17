@@ -29,6 +29,7 @@ export default function InventoryList() {
   const [newToolName, setNewToolName] = useState('');
   const [newToolCategory, setNewToolCategory] = useState('Électroportatif');
   const [newToolSerial, setNewToolSerial] = useState('');
+  const [newToolBLE, setNewToolBLE] = useState(false);
 
   // Load data from SQLite
   useEffect(() => {
@@ -224,6 +225,20 @@ export default function InventoryList() {
                     placeholder="SN-XXXXX"
                   />
                 </div>
+
+                {/* BLE Toggle */}
+                <div className="flex items-center justify-between mt-4 p-3 rounded-lg" style={{ background: 'rgba(255,255,255,0.05)' }}>
+                  <div className="flex items-center gap-3">
+                    <span className="material-symbols-outlined text-white/70">bluetooth</span>
+                    <span className="text-sm text-white">Activer BLE</span>
+                  </div>
+                  <button
+                    onClick={() => setNewToolBLE(!newToolBLE)}
+                    className={`w-12 h-6 rounded-full relative transition-colors ${newToolBLE ? 'bg-[#06C167]' : 'bg-white/20'}`}
+                  >
+                    <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${newToolBLE ? 'right-1' : 'left-1'}`} />
+                  </button>
+                </div>
               </div>
 
               <div className="flex gap-3 mt-6">
@@ -243,7 +258,7 @@ export default function InventoryList() {
                         category: newToolCategory,
                         serial_number: newToolSerial,
                         rfid_enabled: 0,
-                        ble_enabled: 0,
+                        ble_enabled: newToolBLE ? 1 : 0,
                         status: 'available',
                         price: 0,
                       });
@@ -252,6 +267,7 @@ export default function InventoryList() {
                       setShowAddModal(false);
                       setNewToolName('');
                       setNewToolSerial('');
+                      setNewToolBLE(false);
                     } catch (err) {
                       console.error('Add failed:', err);
                     }

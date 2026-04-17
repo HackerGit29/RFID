@@ -101,6 +101,14 @@ export async function getAllTools(): Promise<Tool[]> {
 }
 
 /**
+ * Get tools with BLE enabled (for radar)
+ */
+export async function getBLETools(): Promise<Tool[]> {
+  const tools = await getAllTools();
+  return tools.filter(t => t.ble_enabled === 1);
+}
+
+/**
  * Get tool by ID
  */
 export async function getToolById(id: string): Promise<Tool | null> {

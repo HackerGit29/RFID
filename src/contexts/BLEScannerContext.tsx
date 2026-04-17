@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useCallback, useRef, useEffect, ReactNode } from 'react';
 import { BLEDevice } from '../types';
 import { smoothRSSI, rssiToDistance, getSignalStatus, KalmanFilter, BLE_CONFIG } from '../utils/bleFilters';
+import { getBLETools } from '../utils/db';
 
 interface BLEScannerContextType {
   devices: BLEDevice[];
@@ -68,22 +69,31 @@ export function BLEScannerProvider({ children }: { children: ReactNode }) {
     return () => clearInterval(heartbeatInterval);
   }, []);
 
-  // Mock scanner
+  // Real scanner from IndexedDB tools (BLE enabled)
   useEffect(() => {
     if (!isScanning) return;
 
-    const interval = setInterval(() => {
-      const mockDevices = [
-        { id: 'BEACON_01', name: 'Perceuse Bosch', icon: 'handyman', rssi: -70 + (Math.random() * 10 - 5) },
-        { id: 'BEACON_02', name: 'Oscilloscope', icon: 'precision_manufacturing', rssi: -85 + (Math.random() * 20 - 10) },
-      ];
+    async function loadBLETools() {
+      try {
+        const bleTools = await getBLETools();
+        
+        const interval = setInterval(() => {
+          // Simulate RSSI for each BLE-enabled tool
+          bleTools.forEach(tool => {
+            // Random RSSI simulation (-60 to -90 dBm)
+            const rssi = -60 - Math.random() * 30;
+            const icon = 'handyman';
+            handleDeviceDetected(tool.id, tool.name, rssi, icon);
+          });
+        }, 1000);
 
-      mockDevices.forEach(d => {
-        handleDeviceDetected(d.id, d.name, d.rssi, d.icon);
-      });
-    }, 500);
+        return () => clearInterval(interval);
+      } catch (err) {
+        console.warn('[BLE] No tools found:', err);
+      }
+    }
 
-    return () => clearInterval(interval);
+    loadBLETools();
   }, [isScanning, handleDeviceDetected]);
 
   const startScan = useCallback(() => {
