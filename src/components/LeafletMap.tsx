@@ -5,21 +5,16 @@ import { useMapContext, MapItem } from '../contexts/MapContext';
 import { useTheme } from '../contexts/ThemeContext';
 import 'leaflet/dist/leaflet.css';
 
-// Fix for default Leaflet marker icons
-import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
-import markerIcon from 'leaflet/dist/images/marker-icon.png';
-import markerShadow from 'leaflet/dist/images/marker-shadow.png';
-
 // Custom marker icons
 const createCustomIcon = (status?: string): Icon => {
+  const color = status === 'in_use' ? '#3B82F6' : status === 'maintenance' ? '#F59E0B' : status === 'lost' ? '#EF4444' : '#06C167';
+  const svgIcon = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path fill="${color}" d="M384 192c0 87.4-117 243-168.3 307.2c-12.3 15.3-35.1 15.3-47.4 0C117 435 0 279 0 192C0 86 86 0 192 0s192 86 192 192z"/></svg>`;
+  
   return new Icon({
-    iconUrl: markerIcon,
-    iconRetinaUrl: markerIcon2x,
-    shadowUrl: markerShadow,
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
+    iconUrl: svgIcon,
+    iconSize: [25, 40],
+    iconAnchor: [12, 40],
     popupAnchor: [1, -34],
-    shadowSize: [41, 41],
   });
 };
 

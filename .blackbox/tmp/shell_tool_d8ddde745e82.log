@@ -1,0 +1,51 @@
+$ vite build && cap sync android && cap run android
+vite v8.0.3 building client environment for production...
+[2Ktransforming...
+images/layers.png referenced in images/layers.png didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+images/layers-2x.png referenced in images/layers-2x.png didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+images/marker-icon.png referenced in images/marker-icon.png didn't resolve at build time, it will remain unchanged to be resolved at runtime
+✓ 148 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                     1.34 kB │ gzip:   0.62 kB
+dist/assets/index-BP-gLAcE.css     81.80 kB │ gzip:  18.96 kB
+dist/assets/web-Bf_ZEgVH.js         1.09 kB │ gzip:   0.49 kB
+dist/assets/web-Pw3P27fh.js         1.63 kB │ gzip:   0.61 kB
+dist/assets/index-ptqBMOpD.js   1,396.63 kB │ gzip: 307.31 kB
+
+✓ built in 1.08s
+Development mode, bundle is load from http://192.168.1.153:5173/
+✔ Copying web assets from dist to android/app/src/main/assets/public in 8.00ms
+✔ Creating capacitor.config.json in android/app/src/main/assets in 700.27μs
+✔ copy android in 117.12ms
+✔ Updating Android plugins in 28.96ms
+[info] Found 5 Capacitor plugins for android:
+       @capacitor/app@8.1.0
+       @capacitor/camera@8.0.2
+       @capacitor/haptics@8.0.2
+       @capacitor/network@6.0.4
+       @capacitor/splash-screen@8.0.1
+✔ update android in 174.18ms
+[info] Sync finished in 0.416s
+Development mode, bundle is load from http://192.168.1.153:5173/
+✔ Copying web assets from dist to android/app/src/main/assets/public in 8.94ms
+✔ Creating capacitor.config.json in android/app/src/main/assets in 741.12μs
+[info] Inlining sourcemaps
+✔ copy android in 129.23ms
+✔ Updating Android plugins in 45.44ms
+[info] Found 5 Capacitor plugins for android:
+       @capacitor/app@8.1.0
+       @capacitor/camera@8.0.2
+       @capacitor/haptics@8.0.2
+       @capacitor/network@6.0.4
+       @capacitor/splash-screen@8.0.1
+✔ update android in 180.89ms
+[error] native-run failed with error
+        
+        ERR_SDK_PACKAGE_NOT_FOUND: SDK package not found by location: /home/mopaossi/android-sdk/platform-tools.
+        
+        More details for this error may be available online: https://github.com/ionic-team/native-run/wiki/Android-Errors
+        
+error: script "dev:android" exited with code 1

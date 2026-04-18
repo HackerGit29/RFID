@@ -1,0 +1,93 @@
+$ vite build && cap sync android && cap run android
+vite v8.0.3 building client environment for production...
+[2Ktransforming...
+images/layers.png referenced in images/layers.png didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+images/layers-2x.png referenced in images/layers-2x.png didn't resolve at build time, it will remain unchanged to be resolved at runtime
+
+images/marker-icon.png referenced in images/marker-icon.png didn't resolve at build time, it will remain unchanged to be resolved at runtime
+✓ 148 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                     1.34 kB │ gzip:   0.62 kB
+dist/assets/index-BP-gLAcE.css     81.80 kB │ gzip:  18.96 kB
+dist/assets/web-Bf_ZEgVH.js         1.09 kB │ gzip:   0.49 kB
+dist/assets/web-Pw3P27fh.js         1.63 kB │ gzip:   0.61 kB
+dist/assets/index-ptqBMOpD.js   1,396.63 kB │ gzip: 307.31 kB
+
+✓ built in 999ms
+Development mode, bundle is load from http://192.168.1.153:5173/
+✔ Copying web assets from dist to android/app/src/main/assets/public in 7.63ms
+✔ Creating capacitor.config.json in android/app/src/main/assets in 705.02μs
+✔ copy android in 113.71ms
+✔ Updating Android plugins in 29.05ms
+[info] Found 5 Capacitor plugins for android:
+       @capacitor/app@8.1.0
+       @capacitor/camera@8.0.2
+       @capacitor/haptics@8.0.2
+       @capacitor/network@6.0.4
+       @capacitor/splash-screen@8.0.1
+✔ update android in 160.81ms
+[info] Sync finished in 0.394s
+Development mode, bundle is load from http://192.168.1.153:5173/
+✔ Copying web assets from dist to android/app/src/main/assets/public in 7.53ms
+✔ Creating capacitor.config.json in android/app/src/main/assets in 805.49μs
+[info] Inlining sourcemaps
+✔ copy android in 116.96ms
+✔ Updating Android plugins in 29.96ms
+[info] Found 5 Capacitor plugins for android:
+       @capacitor/app@8.1.0
+       @capacitor/camera@8.0.2
+       @capacitor/haptics@8.0.2
+       @capacitor/network@6.0.4
+       @capacitor/splash-screen@8.0.1
+✔ update android in 160.22ms
+✖ Running Gradle build - failed!
+[error] 
+        > Configure project :app
+        WARNING:Using flatDir should be avoided because it doesn't support any meta-data formats.
+        
+        > Configure project :capacitor-cordova-android-plugins
+        WARNING:Using flatDir should be avoided because it doesn't support any meta-data formats.
+        WARNING:We recommend using a newer Android Gradle plugin to use compileSdk = 34
+        
+        This Android Gradle plugin (7.4.2) was tested up to compileSdk = 33
+        
+        This warning can be suppressed by adding
+        android.suppressUnsupportedCompileSdk=34
+        to this project's gradle.properties
+        
+        The build will continue, but you are strongly encouraged to update your project to
+        use a newer Android Gradle Plugin that has been tested with compileSdk = 34
+        Observed package id 'build-tools;debian' in inconsistent location '/usr/lib/android-sdk/build-tools/27.0.1' (Expected '/usr/lib/android-sdk/build-tools/debian')
+        Observed package id 'build-tools;debian' in inconsistent location '/usr/lib/android-sdk/build-tools/27.0.1' (Expected '/usr/lib/android-sdk/build-tools/debian')
+        Observed package id 'build-tools;debian' in inconsistent location '/usr/lib/android-sdk/build-tools/27.0.1' (Expected '/usr/lib/android-sdk/build-tools/debian')
+        Checking the license for package Android SDK Build-Tools 30.0.3 in /usr/lib/android-sdk/licenses
+        Warning: License for package Android SDK Build-Tools 30.0.3 not accepted.
+        Checking the license for package Android SDK Platform 34 in /usr/lib/android-sdk/licenses
+        Warning: License for package Android SDK Platform 34 not accepted.
+        
+        FAILURE: Build failed with an exception.
+        
+        * What went wrong:
+        Could not determine the dependencies of task ':app:compileDebugJavaWithJavac'.
+        > Could not determine the dependencies of null.
+        > Failed to install the following Android SDK packages as some licences have not been accepted.
+        platforms;android-34 Android SDK Platform 34
+        build-tools;30.0.3 Android SDK Build-Tools 30.0.3
+        To build this project, accept the SDK license agreements and install the missing components using the Android Studio SDK Manager.
+        All licenses can be accepted using the sdkmanager command line tool:
+        sdkmanager.bat --licenses
+        Or, to transfer the license agreements from one workstation to another, see https://developer.android.com/studio/intro/update.html#download-with-gradle
+        
+        Using Android SDK: /usr/lib/android-sdk
+        
+        * Try:
+        > Run with --stacktrace option to get the stack trace.
+        > Run with --info or --debug option to get more log output.
+        > Run with --scan to get full insights.
+        > Get more help at https://help.gradle.org.
+        
+        BUILD FAILED in 7s
+        
+error: script "dev:android" exited with code 1

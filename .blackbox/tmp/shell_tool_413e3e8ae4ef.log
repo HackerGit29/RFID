@@ -1,0 +1,21 @@
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+A problem occurred configuring root project 'android'.
+> Could not resolve all files for configuration ':classpath'.
+   > Could not resolve com.android.tools.build:gradle:8.1.1.
+     Required by:
+         project :
+      > Could not resolve com.android.tools.build:gradle:8.1.1.
+         > Could not get resource 'https://dl.google.com/dl/android/maven2/com/android/tools/build/gradle/8.1.1/gradle-8.1.1.pom'.
+            > Could not GET 'https://dl.google.com/dl/android/maven2/com/android/tools/build/gradle/8.1.1/gradle-8.1.1.pom'.
+               > dl.google.com: Échec temporaire dans la résolution du nom
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 1m 11s

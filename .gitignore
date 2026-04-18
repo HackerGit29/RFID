@@ -3,7 +3,7 @@
 node_modules/
 dist/
 .env
-
+.env.local
 .qwen
 
 BLACKBOX.md
@@ -25,3 +25,4 @@ QWEN.md
 .claude
 
 .mulch
+plantUML/
