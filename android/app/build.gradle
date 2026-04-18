@@ -3,6 +3,20 @@ apply plugin: 'com.android.application'
 android {
     namespace "com.capacitor.livereload"
     compileSdk rootProject.ext.compileSdkVersion
+    
+    splits {
+        abi {
+            enable true
+            reset()
+            include 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
+            universalApk true
+        }
+    }
+    
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
     defaultConfig {
         applicationId "com.capacitor.livereload"
         minSdkVersion rootProject.ext.minSdkVersion
